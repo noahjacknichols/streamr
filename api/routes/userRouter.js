@@ -5,4 +5,6 @@ const userController = require('../controllers/userController');
 
 user.get('/', validateToken, userController.getUserInfo);
 
+user.put('/', validateToken, userController.editUserInfo);
+
 module.exports = user;

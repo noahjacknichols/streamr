@@ -4,14 +4,33 @@ const express = require('express'),
     http = require('http'),
     cors = require('cors'),
     mongoose = require('mongoose'),
+    morgan = require('morgan'),
     routes = require('./routes/routes.js');
 
 port = process.env.port
-mongoose.connect(process.env.DB_STRING);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, );
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(routes);
 const server = http.createServer(app);
-server.listen(port);
+server.listen(port, () => {
+    console.log("API running on port", port);
+});
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 400).json({
+      success: false,
+      message: err.message || "An error occurred",
+      errors: err.error || [],
+    });
+  });
+  
+  app.use((req, res) => {
+    res.status(404).json({ success: false, message: "Resource not found." });
+  });
+  
 
 module.exports = server;

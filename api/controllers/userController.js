@@ -21,6 +21,23 @@ exports.getUserInfo = async (req, res, next) => {
         })
     } catch (err) {
         console.error(err);
-        res.status(400).send({ message: "error fetching user"});
+        res.status(400).json(err);
+    }
+}
+
+exports.editUserInfo = async(req, res, next) => {
+    const field = req.body.field;
+    const value = req.body.value;
+    try{
+        const update = { $set: {[field]: value}};
+        User.findOneAndUpdate({_id: req.user.id}, update, {new: true}, (err, user) => {
+            const payload = {
+                "updated": user
+            };
+            res.status(200).json(payload);
+        })
+    }catch (err) {
+        console.error(err);
+        res.status(400).json({err});
     }
 }
