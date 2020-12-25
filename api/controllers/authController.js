@@ -19,7 +19,8 @@ exports.login = async (req, res, next) => {
           id: user.id,
         },
       };
-      jwt.sign(payload, "randomString", { expiresIn: 36000 }, (err, token) => {
+      // jwt.sign(payload, "randomString", { expiresIn: 36000 }, (err, token) => {
+      jwt.sign(payload, "randomString", (err, token) => {
         if (err) throw err;
         res.status(200).json({ token });
       });
