@@ -49,7 +49,8 @@ exports.getVideoById = async (req, res, next) => {
 }
 
 exports.streamVideo = (req, res) => {
-    const path = req.body.path;
+    // const path = req.body.path;
+    const path = "public/assets/eva.mp4";
     fs.stat(path, (err, stat) => {
         if (err !== null && err.code === 'ENOENT') {
             res.sendStatus(404);
