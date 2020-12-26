@@ -50,7 +50,7 @@ exports.getVideoById = async (req, res, next) => {
 
 exports.streamVideo = (req, res) => {
     // const path = req.body.path;
-    const path = "public/assets/eva.mp4";
+    const path = "public/assets/eva2.mkv";
     fs.stat(path, (err, stat) => {
         if (err !== null && err.code === 'ENOENT') {
             res.sendStatus(404);
@@ -71,6 +71,7 @@ exports.streamVideo = (req, res) => {
                 'Accept-Ranges': 'bytes',
                 'Content-Length': chunksize,
                 'Content-Type': 'video/mp4',
+                'Access-Control-Allow-Origin': '*',
             }
             res.writeHead(206, head);
             file.pipe(res);

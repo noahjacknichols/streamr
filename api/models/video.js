@@ -10,12 +10,17 @@ const VideoSchema = new Schema(
         },
         video_link: {
             type:String,
-            required: [true, "can't be blank"]
         },
         genres: [],      
         favorite: {
             type: Boolean,
             default: false
+        },
+        next_video: {
+            type: String,
+        },
+        subtitle: {
+            type: String
         }
     },
     {timestamps: true}
