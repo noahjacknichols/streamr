@@ -20,8 +20,8 @@ class VideoPlayerPreview extends React.Component {
                             Evangelion
                         </div>
                         <div className="">
-                            <video className="video-container-preview" autoPlay>
-                                <source src="http://localhost:5000/video/stream" type="video/mp4"></source>
+                            <video className="video-container-preview"  autoPlay preload="metadata">
+                                <source src="http://localhost:5000/video/stream#t=145" type="video/mp4"></source>
                                 <track src="http://localhost:5000/video/stream" kind="subtitles" srcLang="en"></track>
                             </video>
                         </div>

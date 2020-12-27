@@ -5,7 +5,8 @@ import VideoPreview from '../components/preview';
 export default function Home(){
     return(
         <div>
-            {/* <Navbar/> */}
+            <Navbar/>
+            <VideoPreview/>
             <VideoPreview/>
         </div>
     )
