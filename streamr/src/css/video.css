@@ -22,3 +22,53 @@
     outline: none;
 }
 
+.preview-box {
+    margin-top: 50px;
+    display: flex;
+    position:relative;
+    
+}
+
+.video-container-preview {
+    display: flex;
+    position:fixed !important;
+    /* max-width: 1200px; */
+    /* max-height: 00px !important; */
+    width: 70%;
+    height: 30%;
+    /* background-size: cover; */
+    /* overflow: hidden; */
+    object-fit: cover;
+}
+
+.video-container-preview:focus {
+    outline: none;
+}
+
+.videoTitle {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 800;
+    color: white;
+    font-size: 40px;
+    z-index: 1;
+    /* text-align: right; */
+    /* margin-right: 200px; */
+    
+}
+
+.video-play-button {
+    display:flex;
+    position:absolute;
+    float: right;
+    color: white;
+    top: 0;
+    right: 0;
+    margin-top: 10px;
+    text-align: center;
+    width: 30%;
+    /* height: 100%; */
+
+}

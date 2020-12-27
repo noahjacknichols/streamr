@@ -10,7 +10,7 @@ class Navbar extends React.Component {
 
     render() {
         return (
-            <Container fluid>
+            <Container>
                 <Row className="navRow">
                     <Col xs={12}>
                         <ul>
