@@ -70,6 +70,7 @@
     display:flex;
     /* position:absolute; */
     color: white;
+    background-color: black;
     /* top: 0; */
     /* right: 0; */
     margin-left: 20px;
@@ -77,4 +78,13 @@
     /* width: 29%; */
     /* height: 100%; */
 
+}
+
+.video-play-icon {
+    font-family: FontAwesome !important;
+    color: white;
+    width: 50px;
+    margin-top: 150%;
+    font-size: 40px;
+    margin-left: 50%;
 }

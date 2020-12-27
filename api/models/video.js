@@ -19,7 +19,13 @@ const VideoSchema = new Schema(
         next_video: {
             type: String,
         },
-        subtitle: {
+        subtitles: {
+            type: String
+        },
+        length: {
+            type: String
+        },
+        thumbnail: {
             type: String
         }
     },
