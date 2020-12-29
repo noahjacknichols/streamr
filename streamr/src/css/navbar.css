@@ -32,6 +32,13 @@ background-color: white;
     height: 40px;
 }
 
+.upload-icon {
+    font-family: FontAwesome !important;
+    color: white;
+    width: 50px;
+    font-style: normal!important;
+}
+
 a {
 text-decoration: none !important;
 }

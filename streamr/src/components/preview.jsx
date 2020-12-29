@@ -35,24 +35,30 @@ class VideoPlayerPreview extends React.Component {
     }
     
     render() {
+        
+        const url=`http://localhost:5000/video/${this.props.videoId}/stream#t=145`
         return(
             <div className="preview-box">
                 <div>
                     <div className="videoTitle">
-                            Evangelion
+                            Evangelion Evangelion nick is dummy thicc
                         </div>
                         <div className="">
                             <video className="video-container-preview" ref={this.playerRef}
                                 onMouseEnter={this.vidPlay} onMouseLeave={this.vidPause}  preload="metadata">
-                                <source src="http://localhost:5000/video/stream#t=145" type="video/mp4"></source>
+                                <source src={url} type="video/mp4"></source>
                                 <track src="http://localhost:5000/video/stream" kind="subtitles" srcLang="en"></track>
                             </video>
                         </div>
                 </div>
 
                 <div className="video-play-button shadow">
+                    <div onClick={this.toVideo} className="play-section">
+                        <i className="video-play-icon fas fa-play "> </i>
+                        <div className="video-play-text">Play</div>
+                    </div>
+                    <i onClick={this.toVideo}className="setting-icon fas fa-cog "></i>
                     
-                    <i onClick={this.toVideo}className="video-play-icon fas fa-play "></i>
                 </div>
             </div>
         )

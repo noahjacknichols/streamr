@@ -8,7 +8,7 @@ exports.uploadVideo = async(req, res, next) => {
     const { video_title, video_link } = req.body;
     console.log(video_title, video_link);
     try {
-        let newVideo = new Video({video_title: video_title, video_link: video_link});
+        let newVideo = new Video({video_title: video_title});
         newVideo.save( (err, entry) => {
             if (err) {
                 return next({
@@ -50,38 +50,71 @@ exports.getVideoById = async (req, res, next) => {
 
 exports.streamVideo = (req, res) => {
     // const path = req.body.path;
-    const path = "public/assets/eva2.mkv";
-    fs.stat(path, (err, stat) => {
-        if (err !== null && err.code === 'ENOENT') {
-            res.sendStatus(404);
-        }
-        const fileSize = stat.size;
-        const range = req.headers.range
-
-        if(range) {
-            const parts = range.replace(/bytes=/, "").split('-');
-
-            const start = parseInt(parts[0], 10);
-            const end = parts[1] ? parseInt(parts[1], 10) : fileSize -1;
-
-            const chunksize = (end - start) +1;
-            const file = fs.createReadStream(path, {start, end});
-            const head = {
-                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': 'video/mp4',
-                'Access-Control-Allow-Origin': '*',
+    const path = "public/assets/mr.robot.mkv";
+    try{
+        fs.stat(path, (err, stat) => {
+            if (err !== null && err.code === 'ENOENT') {
+                res.sendStatus(404);
             }
-            res.writeHead(206, head);
-            file.pipe(res);
-        } else {
-            const head = {
-                'Content-Length': fileSize,
-                'Content-Type': 'video/mp4',
+            const fileSize = stat.size;
+            const range = req.headers.range
+    
+            if(range) {
+                const parts = range.replace(/bytes=/, "").split('-');
+    
+                const start = parseInt(parts[0], 10);
+                const end = parts[1] ? parseInt(parts[1], 10) : fileSize -1;
+    
+                const chunksize = (end - start) +1;
+                const file = fs.createReadStream(path, {start, end});
+                const head = {
+                    'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunksize,
+                    'Content-Type': 'video/mp4',
+                    'Access-Control-Allow-Origin': '*',
+                }
+                res.writeHead(206, head);
+                file.pipe(res);
+            } else {
+                const head = {
+                    'Content-Length': fileSize,
+                    'Content-Type': 'video/mp4',
+                }
+                res.writeHead(200, head);
+                fs.createReadStream(path).pipe(res);
             }
-            res.writeHead(200, head);
-            fs.createReadStream(path).pipe(res);
-        }
-    })
+        })
+    } catch (e) {
+        next({
+            status: 400,
+            message: "something wen't wrong getting that video",
+            error: e.message
+        })
+    }
+    
+}
+
+exports.editVideoInfo = async(req, res, next) => {
+    if (!req.body.field || !req.body.value || !req.body.videoId) {
+        return next({
+            status: 400,
+            message: "Incorrect body sent"
+        })
+    }
+    const field = req.body.field;
+    const value = req.body.value;
+    const videoId = req.body.videoId;
+    try{
+        const update = { $set: {[field]: value}};
+        Video.findOneAndUpdate({_id: videoId}, update, {new: true}, (err, user) => {
+            const payload = {
+                "updated": user
+            };
+            res.status(200).json(payload);
+        })
+    }catch (err) {
+        console.error(err);
+        res.status(400).json({err});
+    }
 }

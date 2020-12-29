@@ -18,7 +18,7 @@ class Navbar extends React.Component {
                                 <li className="nav-item logo noselect">Streamr</li>
                             </a>
                             <a href="/">
-                                <li className="nav-item right">Upload</li>
+                                <li className="nav-item right"><i className="upload-icon fas fa-cloud"></i></li>
                             </a>
 
                         </ul>
