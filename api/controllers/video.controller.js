@@ -4,7 +4,7 @@ const fs = require('fs');
 let Video = mongoose.model("Video", VideoSchema);
 
 
-exports.uploadVideo = async(req, res, next) => {
+exports.createVideo = async(req, res, next) => {
     const { video_title, video_link } = req.body;
     console.log(video_title, video_link);
     try {
@@ -50,12 +50,20 @@ exports.getVideoById = async (req, res, next) => {
 
 exports.streamVideo = (req, res) => {
     // const path = req.body.path;
-    const path = "public/assets/mr.robot.mkv";
+    const path = "public/assets/eva2.mkv";
     try{
         fs.stat(path, (err, stat) => {
             if (err !== null && err.code === 'ENOENT') {
                 res.sendStatus(404);
+            }else if (err || !stat){
+                console.log("here");
+                return next({
+                    status: 400,
+                    message: "Something went wrong with request",
+                    error: err.message
+                });
             }
+            
             const fileSize = stat.size;
             const range = req.headers.range
     
@@ -102,11 +110,9 @@ exports.editVideoInfo = async(req, res, next) => {
             message: "Incorrect body sent"
         })
     }
-    const field = req.body.field;
-    const value = req.body.value;
-    const videoId = req.body.videoId;
+    const { field, value, videoId } = red.body;
     try{
-        const update = { $set: {[field]: value}};
+        const update = { $set: { [field]: value }};
         Video.findOneAndUpdate({_id: videoId}, update, {new: true}, (err, user) => {
             const payload = {
                 "updated": user
@@ -116,5 +122,28 @@ exports.editVideoInfo = async(req, res, next) => {
     }catch (err) {
         console.error(err);
         res.status(400).json({err});
+    }
+}
+
+exports.uploadVideo = async(req, res, next) => {
+    if(!req.params.fileType === 'file'){
+
+    }
+}
+
+function handleFileUpload(req, res) {
+    try{
+        if(!req.files){
+            next({
+                status: 400,
+                message: "file not sent in request"
+            });
+        }else{
+            let file = req.files.file;
+            file.mv('./public/assets/' + req.params.videoId);
+            Video.findOneAndUpdate({_id: videoId}, {$set: {[video_link]: 'public/assets/' + req.params.videoId}})
+        }
+    }catch(e) {
+        res.status(400).json({error: e.message})
     }
 }

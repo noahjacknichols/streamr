@@ -1,9 +1,9 @@
 const express = require('express');
 const routes = express.Router();
 
-const authRouter = require('./authRouter'),
-    userRouter = require('./userRouter'),
-    videoRouter = require('./videoRouter');
+const authRouter = require('./auth.router'),
+    userRouter = require('./user.router'),
+    videoRouter = require('./video.router');
 
 routes.use('/', authRouter);
 routes.use('/user', userRouter);
