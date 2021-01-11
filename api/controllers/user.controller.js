@@ -6,11 +6,7 @@ exports.getUserInfo = async (req, res, next) => {
     try{
         User.findById({ _id: req.user.id }, (err, user) => {
             if (err)
-                return next({
-                    status: 400,
-                    message: "error in finding user.",
-                    error: err.message,
-                });
+                return res.status(400).json({error: err.message});
             const payload = {
                 id: user._id,
                 firstname: user.firstname,
@@ -20,8 +16,7 @@ exports.getUserInfo = async (req, res, next) => {
             res.status(200).json(payload);
         })
     } catch (err) {
-        console.error(err);
-        res.status(400).json(err);
+        res.status(400).json(err.message);
     }
 }
 

@@ -5,9 +5,7 @@ let Video = mongoose.model("Video", VideoSchema);
 let videoService = require('../services/video.service');
 
 exports.createVideo = async (req, res, next) => {
-    // const { video_title, video_link } = req.body;
     try{
-        console.log('user:', req.user);
         let insertedVid = await videoService.createVideo(req.body, req.user);
         return res.status(200).json(insertedVid);
     } catch(e) {

@@ -6,7 +6,6 @@ const c = require('../constants');
 
 exports.createVideo = async(body, user) => {
     body._uploadedById = user.id;
-    // console.log(body);
     try{
         const vidRecord = await Video.create(body);
         if(!vidRecord) throw new Error(c.ERROR.NO_RESULT);
@@ -14,7 +13,6 @@ exports.createVideo = async(body, user) => {
     } catch (e) {
         throw e;
     }
-
 }
 
 exports.getVideo = async(videoId) => {
@@ -25,7 +23,6 @@ exports.getVideo = async(videoId) => {
     } catch (e) {
         throw e;
     }
-
 }
 
 exports.streamVideo = (path, range, res) => {
