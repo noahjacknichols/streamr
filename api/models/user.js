@@ -5,12 +5,10 @@ const { Schema } = mongoose;
 const UserSchema = new Schema(
   {
     firstname: {
-      type: String,
-      required: [true, "can't be blank"],
+      type: String
     },
     lastname: {
-      type: String,
-      required: [true, "can't be blank"],
+      type: String
     },
     email: {
       type: String,

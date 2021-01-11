@@ -34,7 +34,7 @@ exports.login = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     const User = mongoose.model("User", UserSchema);
-    const { firstname, lastname, email, password } = req.body;
+    const {email, password } = req.body;
   
     try {
       let user = await User.findOne({ email: email });
@@ -42,8 +42,6 @@ exports.create = async (req, res, next) => {
         return res.status(400).json({ message: "user already exists" });
       }
       user = new User({
-        firstname,
-        lastname,
         email,
         password,
       });

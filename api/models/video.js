@@ -11,6 +11,10 @@ const VideoSchema = new Schema(
         video_link: {
             type:String,
         },
+        _uploadedById: {
+            type: Schema.Types.ObjectId,
+            required: true
+        },
         genres: [],      
         favorite: {
             type: Boolean,
