@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const fs = require('fs');
 let Video = mongoose.model("Video", VideoSchema);
 const c = require('../constants');
+let util = require('../util');
 
 exports.createVideo = async(body, user) => {
     body._uploadedById = user.id;
@@ -77,7 +78,12 @@ exports.handleFileUpload = async(file, videoId) => {
             throw new Error(c.ERROR.BAD_BODY);
         }else{
             let file = req.files.file;
-            await file.mv('./public/assets/' + req.params.videoId);
+            const params = {
+                Bucket: process.env.BUCKET_NAME,
+                Key: req.files.file.name,
+                Body: file
+            }
+            const location = util.uploadToBucket(params);
             let updated = Video.findOneAndUpdate({_id: videoId}, {$set: {[video_link]: 'public/assets/' + videoId}})
             return updated;
         }
