@@ -8,11 +8,11 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     let user = await User.findOne({ email: email });
-    if (!user) return res.status(400).json({ message: c.ERROR.BAD_USER_CREDENTIALS });
+    if (!user) return res.status(400).json({ error: c.ERROR.BAD_USER_CREDENTIALS });
     await bcrypt.compare(password, user.password, (err, result) => {
-      if (err) return res.status(400).send("couldn't decrypt password");
+      if (err) return res.status(400).json({error: err.message});
       if (!result)
-        return res.status(400).json({ message: c.ERROR.BAD_USER_CREDENTIALS });
+        return res.status(400).json({ error: c.ERROR.BAD_USER_CREDENTIALS });
       const payload = {
         user: {
           id: user.id,

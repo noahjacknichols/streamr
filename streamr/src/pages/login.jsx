@@ -1,7 +1,5 @@
 import Navbar from '../components/navbar';
-import Video from '../components/video';
-import VideoPreview from '../components/preview';
-import UploadForm from '../components/uploadForm';
+import LoginForm from '../components/loginForm';
 
 export default function Home(){
     return(
@@ -9,7 +7,11 @@ export default function Home(){
             <Navbar/>
             {/* <VideoPreview/>
             <VideoPreview/> */}
-            <UploadForm/>
+            {/* <UploadForm/> */}
+            <div>
+                Hello ugly
+            </div>
+            <LoginForm/>
         </div>
     )
 }

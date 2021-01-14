@@ -84,7 +84,7 @@ exports.handleFileUpload = async(file, videoId) => {
                 Body: file
             }
             const location = util.uploadToBucket(params);
-            let updated = Video.findOneAndUpdate({_id: videoId}, {$set: {[video_link]: 'public/assets/' + videoId}})
+            let updated = Video.findOneAndUpdate({_id: videoId}, {$set: {[video_link]: location}})
             return updated;
         }
     }catch(e) {
