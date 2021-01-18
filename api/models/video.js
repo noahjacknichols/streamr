@@ -6,7 +6,7 @@ const VideoSchema = new Schema(
     {
         video_title: {
             type: String,
-            required: [true, "can't be blank"]
+            // required: [true, "can't be blank"]
         },
         video_link: {
             type:String,

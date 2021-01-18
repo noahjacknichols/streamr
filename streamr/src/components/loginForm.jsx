@@ -1,6 +1,8 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import { userService } from '../services/user.service';
-export default class LoginForm extends React.Component {
+import cookie from 'react-cookies';
+ class LoginForm extends React.Component {
     constructor(props){
         super();
         this.state = {
@@ -14,19 +16,18 @@ export default class LoginForm extends React.Component {
         this.setState({ [evt.target.name]: value});
     }
 
-    handleSubmit = (evt) => {
+    handleSubmit = async (evt) => {
         evt.preventDefault();
         const data = {
             'email': this.state.email,
             'password': this.state.password
         }
-        let x = userService.login(data)
-        .then(resolve => {
-            console.log('userService response:', x);
-        })
-        .catch(reject => {
-            console.log('login failed with:', reject.message);
-        })
+        let x = await userService.login(data);
+        console.log('x:',x.token);
+        if(!x.token) return;
+        await cookie.save('token', x.token, {path: '/'});
+        this.props.history.push('/');
+
 
     }
     render() {
@@ -48,3 +49,5 @@ export default class LoginForm extends React.Component {
         )
     }
 }
+
+export default withRouter(LoginForm);

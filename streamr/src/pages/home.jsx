@@ -7,8 +7,8 @@ export default function Home(){
     return(
         <div>
             <Navbar/>
-            {/* <VideoPreview/>
-            <VideoPreview/> */}
+            <VideoPreview/>
+            <VideoPreview/>
             <UploadForm/>
         </div>
     )

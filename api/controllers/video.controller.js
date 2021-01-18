@@ -8,11 +8,14 @@ let videoService = require('../services/video.service');
 exports.createVideo = async (req, res, next) => {
     try{
         let insertedVid = await videoService.createVideo(req.body, req.user);
+        console.log('files:', req.files.file);
         if(req.files){
-            insertedVid = await videoService.handleFileUpload(req.files, insertedVid.id);
+            insertedVid = await videoService.handleFileUpload(req.files.file, insertedVid.id);
+            console.log('inserted:',insertedVid);
         }
         return res.status(200).json(insertedVid);
     } catch(e) {
+        console.log(e.message);
         res.status(400).json({error: e.message});
     }
 }

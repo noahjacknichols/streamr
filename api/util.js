@@ -11,7 +11,7 @@ function createBucket() {
     try{
         s3.createBucket(params, function(err, data) {
             if (err) console.log(err, err.stack);
-            else console.log('Bucket created', data.location);
+            else console.log('Bucket created', data);
         })
     } catch (e) {
         console.log(err.message);
@@ -19,14 +19,17 @@ function createBucket() {
 }
 createBucket();
 
-exports.uploadToBucket = (params) => {
+exports.uploadToBucket = (params, callback) => {
     try{
-        s3.upload(params, function(err, data) {
-            if (err) throw err;
-            console.log('file uploaded');
-            return data.location;
+        console.log('params:', params);
+        return s3.putObject(params).promise().then( data => {
+            console.log(data);
+            callback(data);
         })
     } catch (e) {
-        console.log(e.message);
+        console.log('error uploading');
+        throw e;
     }
+    return 'test'
+
 }

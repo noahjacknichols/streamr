@@ -14,6 +14,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, );
 app.use(morgan('dev'));
+app.use(fileUpload());
 app.use(cors());
 app.use(express.json());
 app.use(routes);
@@ -22,9 +23,7 @@ server.listen(port, () => {
     console.log("API running on port", port);
 });
 
-app.use(fileUpload({
-  createParentPath: true
-}));
+
 
 app.use((err, req, res, next) => {
     res.status(err.status || 400).json({

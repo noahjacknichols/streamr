@@ -4,6 +4,7 @@ const fs = require('fs');
 let Video = mongoose.model("Video", VideoSchema);
 const c = require('../constants');
 let util = require('../util');
+const AWS = require('aws-sdk');
 
 exports.createVideo = async(body, user) => {
     body._uploadedById = user.id;
@@ -77,17 +78,32 @@ exports.handleFileUpload = async(file, videoId) => {
         if(!file){
             throw new Error(c.ERROR.BAD_BODY);
         }else{
-            let file = req.files.file;
             const params = {
                 Bucket: process.env.BUCKET_NAME,
-                Key: req.files.file.name,
-                Body: file
+                Key: file.name,
+                Body: file.data,
+                ContentType: '',
             }
-            const location = util.uploadToBucket(params);
-            let updated = Video.findOneAndUpdate({_id: videoId}, {$set: {[video_link]: location}})
-            return updated;
+            const s3 = new AWS.S3({
+                accessKeyId: process.env.AWS_ACCESS_KEY,
+                secretAccessKey: process.env.AWS_SECRET_KEY
+            });
+            const test = await s3.upload(params).promise();
+            console.log('test:', test);
+            return test;
+                // return await Video.findOneAndUpdate({_id: videoId}, {$set: {'video_link': data.location}});
+
+            // util.uploadToBucket(params, (data) => {
+                
+            // });
+            // console.log('location:', location);
+            // let updated = await Video.findOneAndUpdate({_id: videoId}, {$set: {'video_link': location}})
+            // console.log('updated:', updated);
+
+
         }
     }catch(e) {
+        console.log('error uploading');
         throw e;
     }
 }

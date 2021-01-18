@@ -6,16 +6,13 @@ class VideoPlayerPreview extends React.Component {
     playerRef = React.createRef();
     constructor(props) {
         super();
-        this.toVideo = this.toVideo.bind(this);
-        this.vidPlay = this.vidPlay.bind(this);
-        this.vidPause = this.vidPause.bind(this);
     }
 
-    toVideo() {
+    toVideo = () => {
         this.props.history.push("/video");
     }
     
-    vidPlay() {
+    vidPlay = () => {
         let vid = this.playerRef.current;
         console.log("play");
         if(vid.paused) {
@@ -26,7 +23,7 @@ class VideoPlayerPreview extends React.Component {
         // this.playerRef.current.play();
     }
 
-    vidPause() {
+    vidPause = () => {
         let vid = this.playerRef.current;
         console.log("pause");
         if(!vid.paused) {

@@ -1,16 +1,12 @@
 import axios from 'axios';
 const url = process.env.REACT_APP_API_DOMAIN;
 
-const login = (data) => {
+const login = async (data) => {
     // console.log("api is:", process.env.REACT_APP_API_DOMAIN);
-    return axios.post(`${url}/login`, data, {
-    })
-    .then(res => {
-        console.log(res);
-    })
-    .catch(reject => {
-        console.log('rejected with:', reject);
-    })
+    console.log(data);
+    let res = await axios.post(`${url}/login`, data, {});
+    console.log('res:', res)
+    return res.data;
 }
 
 

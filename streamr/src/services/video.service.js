@@ -1,16 +1,25 @@
 import axios from 'axios';
 const url = process.env.REACT_APP_API_DOMAIN;
 
-const uploadVideo = (data) => {
+const uploadVideo = async (token, data) => {
     // console.log("api is:", process.env.REACT_APP_API_DOMAIN);
-    return axios.post(`${url}/video`, data, {
-    })
-    .then(res => {
-        console.log(res);
-    })
-    .catch(reject => {
-        console.log('rejected with:', reject);
-    })
+    // for(let key in data.entries()){
+    //     console.log('key:', key);
+    // }
+    console.log(data);
+    let config = {
+        headers: {
+            token: token,
+            "Content-Type": "multipart/form-data"
+        }
+    }
+    console.log('data:', data);
+    let res = await axios.post(`${url}/video`, data, config);
+    console.log('status', res.status);
+    if (!res) return;
+    
+    if(res.status !== '200') console.log(res.data);
+    return res.data;
 }
 
 
