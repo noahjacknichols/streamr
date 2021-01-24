@@ -1,7 +1,7 @@
-import React, { createRef, useRef } from 'react';
+import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom'
-import '../css/video.css';
+import '../../css/video.css';
 class VideoPlayerPreview extends React.Component {
     playerRef = React.createRef();
     constructor(props) {
@@ -14,18 +14,14 @@ class VideoPlayerPreview extends React.Component {
     
     vidPlay = () => {
         let vid = this.playerRef.current;
-        console.log("play");
+        vid.volume = 0.5;
         if(vid.paused) {
             vid.play();
-        }else {
-            // vid.pause();
         }
-        // this.playerRef.current.play();
     }
 
     vidPause = () => {
         let vid = this.playerRef.current;
-        console.log("pause");
         if(!vid.paused) {
             vid.pause();
         }

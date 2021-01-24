@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { userService } from '../services/user.service';
+import { userService } from '../../services/user.service';
 import cookie from 'react-cookies';
  class LoginForm extends React.Component {
     constructor(props){
@@ -31,7 +31,6 @@ import cookie from 'react-cookies';
 
     }
     render() {
-        
         return(
             <div>
                 <form autoComplete="off" name="login" onSubmit={this.handleSubmit}>

@@ -28,14 +28,13 @@ class uploadForm extends React.Component {
         e.preventDefault();
         if(this.state.selectedFile !== null){
             const formData  = new FormData();
-            // console.log('file123:',this.state.selectedFile);
             let x = this.state.selectedFile;
             formData.append('file', this.state.selectedFile);
             
             try{
                 const res = await videoService.uploadVideo(this.state.token, formData);
             } catch (e) {
-                console.log(e.message);
+                console.log('error occurred:', e.message);
             }
             
         }

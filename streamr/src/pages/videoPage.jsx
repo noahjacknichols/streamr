@@ -1,5 +1,5 @@
 import Navbar from '../components/navbar';
-import Video from '../components/video';
+import Video from '../components/videoPlayers/video';
 
 export default function Home(){
     return(

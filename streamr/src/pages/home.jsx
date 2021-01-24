@@ -1,6 +1,6 @@
 import Navbar from '../components/navbar';
-import Video from '../components/video';
-import VideoPreview from '../components/preview';
+import Video from '../components/videoPlayers/video';
+import VideoPreview from '../components/videoPlayers/preview';
 import UploadForm from '../components/uploadForm';
 
 export default function Home(){
@@ -9,7 +9,6 @@ export default function Home(){
             <Navbar/>
             <VideoPreview/>
             <VideoPreview/>
-            <UploadForm/>
         </div>
     )
 }
