@@ -1,9 +1,9 @@
-const VideoSchema = require("../models/video");
+const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
 const fs = require('fs');
 let Video = mongoose.model("Video", VideoSchema);
-const c = require('../constants');
-let util = require('../util');
+const c = require('../../constants');
+let util = require('../../util');
 const AWS = require('aws-sdk');
 
 exports.createVideo = async(body, user) => {
@@ -104,6 +104,16 @@ exports.handleFileUpload = async(file, videoId) => {
         }
     }catch(e) {
         console.log('error uploading');
+        throw e;
+    }
+}
+
+exports.getAllVideos = async () => {
+    try{
+        const allVideos = await Video.find({});
+        return allVideos;
+    } catch (e) {
+        console.error(e);
         throw e;
     }
 }

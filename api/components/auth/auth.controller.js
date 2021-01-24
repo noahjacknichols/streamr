@@ -1,8 +1,8 @@
-const UserSchema = require("../models/user");
+const UserSchema = require("../user/user.model");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const c = require('../constants')
+const c = require('../../constants')
 let User = mongoose.model("User", UserSchema);
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;

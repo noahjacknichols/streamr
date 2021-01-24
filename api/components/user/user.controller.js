@@ -1,4 +1,4 @@
-const UserSchema = require("../models/user");
+const UserSchema = require("./user.model");
 const mongoose = require("mongoose");
 let User = mongoose.model("User", UserSchema);
 

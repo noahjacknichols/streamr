@@ -1,17 +1,14 @@
-const VideoSchema = require("../models/video");
+const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
 const fs = require('fs');
 let Video = mongoose.model("Video", VideoSchema);
-let videoService = require('../services/video.service');
-
+let videoService = require('./video.service');
 
 exports.createVideo = async (req, res, next) => {
     try{
         let insertedVid = await videoService.createVideo(req.body, req.user);
-        console.log('files:', req.files.file);
         if(req.files){
-            insertedVid = await videoService.handleFileUpload(req.files.file, insertedVid.id);
-            console.log('inserted:',insertedVid);
+            videoService.handleFileUpload(req.files.file, insertedVid.id);
         }
         return res.status(200).json(insertedVid);
     } catch(e) {
@@ -20,12 +17,10 @@ exports.createVideo = async (req, res, next) => {
     }
 }
 
-exports.getVideoById = async (req, res, next) => {
+exports.getVideoById = async (req, res) => {
     const { videoId } = req.params;
-    console.log(videoId);
     try {
         const vid = await videoService.getVideo(videoId)
-        console.log('vid:', vid);
         res.status(200).json(vid);
     } catch (e) {
         res.status(400).json({error: e.message});
@@ -44,7 +39,7 @@ exports.streamVideo = (req, res) => {
     
 }
 
-exports.updateVideo = async(req, res, next) => {
+exports.updateVideo = async(req, res) => {
     try{
         const { videoId } = req.params;
         let updatedVid = await videoService.updateVideo(videoId, req.body);
@@ -53,6 +48,16 @@ exports.updateVideo = async(req, res, next) => {
         }
         return res.status(200).json(updatedVid);
     }catch (e) {
+        console.error(e);
+        res.status(400).json({error: e.message});
+    }
+}
+
+exports.getVideos = async(req, res) => {
+    try{
+        let videos = await videoService.getAllVideos();
+        return res.status(200).json(videos);
+    } catch (e) {
         console.error(e);
         res.status(400).json({error: e.message});
     }

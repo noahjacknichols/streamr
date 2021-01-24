@@ -6,10 +6,9 @@ const express = require('express'),
     mongoose = require('mongoose'),
     morgan = require('morgan'),
     fileUpload = require('express-fileupload'),
-    routes = require('./routes/routes.js');
+    routes = require('./routes.js');
 
 port = process.env.API_PORT
-const ProxyServer= 'http://localhost:'+ process.env.PROXY_PORT;
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, );

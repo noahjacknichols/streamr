@@ -31,6 +31,10 @@ const VideoSchema = new Schema(
         },
         thumbnail: {
             type: String
+        },
+        state: {
+            type: String,
+            default: "HIDDEN", //HIDDEN, UPLOADED, IN_PROGRESS
         }
     },
     {timestamps: true}
