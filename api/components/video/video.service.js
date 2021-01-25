@@ -108,9 +108,12 @@ exports.handleFileUpload = async(file, videoId) => {
     }
 }
 
-exports.getAllVideos = async () => {
+exports.getAllVideos = async (skipBy = 0) => {
     try{
-        const allVideos = await Video.find({});
+        const allVideos = await Video.find()
+        .sort({'createdAt': -1})
+        .limit(15)
+        .skip(skipBy);
         return allVideos;
     } catch (e) {
         console.error(e);

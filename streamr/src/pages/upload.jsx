@@ -1,5 +1,5 @@
 import Navbar from '../components/navbar';
-import UploadForm from '../components/uploadForm';
+import UploadForm from '../components/forms/uploadForm/uploadForm';
 
 export default function Upload(){
     return(

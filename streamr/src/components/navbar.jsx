@@ -14,10 +14,10 @@ class Navbar extends React.Component {
                 <Row className="navRow">
                     <Col xs={12}>
                         <ul>
-                            <a href="/" onClick={this.toHome}>
+                            <a href="/">
                                 <li className="nav-item logo noselect">Streamr</li>
                             </a>
-                            <a href="/">
+                            <a href="/upload">
                                 <li className="nav-item right"><i className="upload-icon fas fa-cloud"></i></li>
                             </a>
 

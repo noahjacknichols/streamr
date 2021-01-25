@@ -26,6 +26,10 @@ class VideoPlayerPreview extends React.Component {
             vid.pause();
         }
     }
+
+    gotoVid = () => {
+        this.props.history.push('/video/' + this.props.videoId);
+    }
     
     render() {
         
@@ -34,11 +38,11 @@ class VideoPlayerPreview extends React.Component {
             <div className="preview-box">
                 <div>
                     <div className="videoTitle">
-                            Evangelion Evangelion nick is dummy thicc
+                            Evangelion 
                         </div>
                         <div className="">
                             <video className="video-container-preview" ref={this.playerRef}
-                                onMouseEnter={this.vidPlay} onMouseLeave={this.vidPause}  preload="metadata">
+                                onMouseEnter={this.vidPlay} onMouseLeave={this.vidPause}  preload="metadata" onClick={this.gotoVid}>
                                 <source src={url} type="video/mp4"></source>
                                 <track src="http://localhost:5000/video/stream" kind="subtitles" srcLang="en"></track>
                             </video>
