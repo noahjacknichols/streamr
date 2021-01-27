@@ -25,15 +25,25 @@ class uploadForm extends React.Component {
         if(this.state.uploadType === 'BUCKET'){
             return <BucketForm/>
         }else if(this.state.uploadType === 'LOCAL'){
-            return <div></div>
+            return <BucketForm local={true}/>
         }else {
 
         }
     }
+    toggleUploadType = (evt) => {
+        const value = evt.target.name;
+        this.setState({ uploadType: value});
+    }
 
     render(){
+        console.log('toggle:', this.state.uploadType);
         return(
             <div>
+                <div>
+                    <button name="LOCAL" onClick={this.toggleUploadType}>local</button>
+                    <button name="BUCKET" onClick={this.toggleUploadType}>cloud</button>
+                    <button name="LINK" onClick={this.toggleUploadType}>URL</button>
+                </div>
                 {this.getLayout()}
             </div>
         )

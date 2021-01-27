@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { userService } from '../services/user.service';
+import { userService } from '../../services/user.service';
 import cookie from 'react-cookies';
  class SignUpForm extends React.Component {
     constructor(props){

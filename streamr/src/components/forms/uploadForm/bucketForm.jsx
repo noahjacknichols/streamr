@@ -32,23 +32,29 @@ class BucketForm extends React.Component {
         })
     }
 
+
     postVideo = async (e) => {
         e.preventDefault();
         if(this.state.selectedFile !== null){
             const formData  = new FormData();
             let x = this.state.selectedFile;
             formData.append('file', this.state.selectedFile);
-            
-            try{
-                const res = await videoService.uploadVideo(this.state.token, formData);
-            } catch (e) {
-                console.log('error occurred:', e.message);
+            if(this.props.local){
+                // local upload here
+                console.log('local server upload');
+            }else{
+                try{
+                    const res = await videoService.uploadVideo(this.state.token, formData);
+                } catch (e) {
+                    console.log('error occurred:', e.message);
+                }
             }
+            
+
             
         }
     }
     render(){
-        console.log(this.state.token);
         return(
             <div>
                 <input name="fileName" type="text" onChange={this.onChangeHandler}></input>
