@@ -3,6 +3,7 @@ import {Container, Row, Col } from 'react-bootstrap';
 import cookie from 'react-cookies';
 import { videoService } from '../../../services/video.service';
 import BucketForm from './bucketForm';
+import UrlForm from './urlForm';
 class uploadForm extends React.Component {
     constructor(props) {
         super(props);
@@ -27,7 +28,7 @@ class uploadForm extends React.Component {
         }else if(this.state.uploadType === 'LOCAL'){
             return <BucketForm local={true}/>
         }else {
-
+            return <UrlForm/>
         }
     }
     toggleUploadType = (evt) => {
@@ -36,7 +37,6 @@ class uploadForm extends React.Component {
     }
 
     render(){
-        console.log('toggle:', this.state.uploadType);
         return(
             <div>
                 <div>

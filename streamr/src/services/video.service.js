@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 const url = process.env.REACT_APP_API_DOMAIN;
 
 const uploadVideo = async (token, data) => {
@@ -10,19 +10,18 @@ const uploadVideo = async (token, data) => {
     let config = {
         headers: {
             token: token,
-            "Content-Type": "multipart/form-data"
-        }
-    }
-    console.log('data:', data);
+            "Content-Type": "multipart/form-data",
+        },
+    };
+    console.log("data:", data);
     let res = await axios.post(`${url}/video`, data, config);
-    console.log('status', res.status);
+    console.log("status", res.status);
     if (!res) return;
-    
-    if(res.status !== '200') console.log(res.data);
-    return res.data;
-}
 
+    if (res.status !== "200") console.log(res.data);
+    return res.data;
+};
 
 export const videoService = {
     uploadVideo,
-}
+};

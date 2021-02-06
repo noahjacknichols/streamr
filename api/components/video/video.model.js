@@ -9,35 +9,35 @@ const VideoSchema = new Schema(
             // required: [true, "can't be blank"]
         },
         video_link: {
-            type:String,
+            type: String,
         },
         _uploadedById: {
             type: Schema.Types.ObjectId,
-            required: true
+            required: true,
         },
-        genres: [],      
+        genres: [],
         favorite: {
             type: Boolean,
-            default: false
+            default: false,
         },
         next_video: {
             type: String,
         },
         subtitles: {
-            type: String
+            type: String,
         },
         length: {
-            type: String
+            type: String,
         },
         thumbnail: {
-            type: String
+            type: String,
         },
         state: {
             type: String,
             default: "HIDDEN", //HIDDEN, UPLOADED, IN_PROGRESS
-        }
+        },
     },
-    {timestamps: true}
+    { timestamps: true }
 );
 
-module.exports = VideoSchema
+module.exports = VideoSchema;

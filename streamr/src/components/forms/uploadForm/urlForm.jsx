@@ -6,9 +6,9 @@ class BucketForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedFile: null,
             token: "",
             fileName: "",
+            url: "",
         };
     }
     componentDidMount() {
@@ -62,9 +62,9 @@ class BucketForm extends React.Component {
                     onChange={this.onChangeHandler}
                 ></input>
                 <input
-                    name="file"
-                    type="file"
-                    onChange={this.onUploadButtonClicked}
+                    name="url"
+                    type="text"
+                    onChange={this.onChangeHandler}
                 ></input>
                 <button type="button" onClick={this.postVideo}>
                     Upload

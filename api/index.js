@@ -22,8 +22,6 @@ server.listen(port, () => {
     console.log("API running on port", port);
 });
 
-
-
 app.use((err, req, res, next) => {
     res.status(err.status || 400).json({
       success: false,

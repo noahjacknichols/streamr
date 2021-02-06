@@ -1,11 +1,11 @@
-import Navbar from '../components/navbar';
-import Video from '../components/videoPlayers/video';
+import Navbar from "../components/navbar";
+import Video from "../components/videoPlayers/video";
 
-export default function Home(){
-    return(
+export default function Home() {
+    return (
         <div>
-            <Navbar/>
-            <Video/>
+            <Navbar />
+            <Video />
         </div>
-    )
+    );
 }
