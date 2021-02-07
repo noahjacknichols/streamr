@@ -1,8 +1,9 @@
 const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
-const fs = require("fs");
+const fs = require("fs").promises;
 let Video = mongoose.model("Video", VideoSchema);
 const c = require("../../constants");
+let fs = require('fs');
 let util = require("../../util");
 const AWS = require("aws-sdk");
 
@@ -114,3 +115,13 @@ exports.getAllVideos = async (skipBy = 0) => {
         throw e;
     }
 };
+
+exports.localUpload = async(file, videoId) => {
+    try {
+        if (!file) throw new Error(c.ERROR.BAD_BODY);
+        await fs.writeFile('/assets/' + videoId, file);
+        return true;
+    } catch (e) {
+        throw e;
+    }
+}

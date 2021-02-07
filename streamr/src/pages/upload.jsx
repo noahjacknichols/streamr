@@ -1,11 +1,11 @@
-import Navbar from '../components/navbar';
-import UploadForm from '../components/forms/uploadForm/uploadForm';
+import Navbar from "../components/navbar";
+import UploadForm from "../components/forms/uploadForm/uploadForm";
 
-export default function Upload(){
-    return(
+export default function Upload() {
+    return (
         <div>
-            <Navbar/>
-            <UploadForm/>
+            <Navbar />
+            <UploadForm />
         </div>
-    )
+    );
 }
