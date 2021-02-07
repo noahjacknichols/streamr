@@ -8,7 +8,9 @@ exports.createVideo = async (req, res, next) => {
     try {
         let insertedVid = await videoService.createVideo(req.body, req.user);
         if (req.files) {
-            videoService.handleFileUpload(req.files.file, insertedVid.id);
+            console.log(req.body);
+            console.log('sent files');
+            videoService.handleFileUpload(req.files.file, insertedVid.id, req.body.uploadType);
         }
         return res.status(200).json(insertedVid);
     } catch (e) {
@@ -43,10 +45,7 @@ exports.updateVideo = async (req, res) => {
         const { videoId } = req.params;
         let updatedVid = await videoService.updateVideo(videoId, req.body);
         if (req.files) {
-            updatedVid = await videoService.handleFileUpload(
-                req.files,
-                videoId
-            );
+            await videoService.handleFileUpload(req.files, videoId, req.body.uploadType);
         }
         return res.status(200).json(updatedVid);
     } catch (e) {

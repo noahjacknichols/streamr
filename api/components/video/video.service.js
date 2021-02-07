@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const fs = require("fs").promises;
 let Video = mongoose.model("Video", VideoSchema);
 const c = require("../../constants");
-let fs = require('fs');
 let util = require("../../util");
 const AWS = require("aws-sdk");
 
@@ -11,7 +10,7 @@ exports.createVideo = async (body, user) => {
     body._uploadedById = user.id;
     try {
         const vidRecord = await Video.create(body);
-        if (!vidRecord) throw new Error(c.ERROR.NO_RESULT);
+        if (!vidRecord) throw new Error(c.ERROR.NO_RESULT).status(500);
         return vidRecord;
     } catch (e) {
         throw e;
@@ -78,25 +77,11 @@ exports.updateVideo = async (videoId, body) => {
     }
 };
 
-exports.handleFileUpload = async (file, videoId) => {
+exports.handleFileUpload = async (file, videoId, uploadType='local') => {
     try {
-        if (!file) {
-            throw new Error(c.ERROR.BAD_BODY);
-        } else {
-            const params = {
-                Bucket: process.env.BUCKET_NAME,
-                Key: file.name,
-                Body: file.data,
-                ContentType: "",
-            };
-            const s3 = new AWS.S3({
-                accessKeyId: process.env.AWS_ACCESS_KEY,
-                secretAccessKey: process.env.AWS_SECRET_KEY,
-            });
-            const test = await s3.upload(params).promise();
-            console.log("test:", test);
-            return test;
-        }
+        if (!file) throw new Error(c.ERROR.BAD_BODY);
+        console.log(file);
+        uploadType === 'cloud' ? cloudUpload(file, videoId) : localUpload(file, videoId);
     } catch (e) {
         console.log("error uploading");
         throw e;
@@ -116,11 +101,37 @@ exports.getAllVideos = async (skipBy = 0) => {
     }
 };
 
-exports.localUpload = async(file, videoId) => {
+localUpload = async(file, videoId) => {
     try {
+        const POSTFIX = `.${file.name.split('.').pop()}`;
+        const PREFIX = `./assets/`
         if (!file) throw new Error(c.ERROR.BAD_BODY);
-        await fs.writeFile('/assets/' + videoId, file);
+        let compressedFile = await snappy.compress(file.data);
+        await fs.writeFile(PREFIX + videoId + POSTFIX, compressedFile);
         return true;
+    } catch (e) {
+        throw e;
+    }
+}
+
+cloudUpload = async(file, videoId) => {
+    console.log('uploading to cloud');
+    try{
+        const POSTFIX = `.${file.name.split('.').pop()}`;
+        let params = { 
+            accessKeyId: process.env.AWS_ACCESS_KEY,
+            secretAccessKey: process.env.AWS_SECRET_KEY,
+            Body: file.data, Key: videoId + POSTFIX,
+            Bucket: process.env.BUCKET_NAME
+        }
+        AWS.config.update({
+            accessKeyId: process.env.AWS_ACCESS_KEY,
+            secretAccessKey: process.env.AWS_SECRET_KEY,
+        })
+        const s3 = await new AWS.S3.ManagedUpload({params});
+        s3.send((err, data) => {
+            console.log(err, data);
+        });
     } catch (e) {
         throw e;
     }
