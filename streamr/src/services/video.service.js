@@ -22,6 +22,21 @@ const uploadVideo = async (token, data) => {
     return res.data;
 };
 
+const getVideos = async(token) => {
+    console.log('allvids');
+    console.log(token);
+    let config = {
+        headers: {
+            token: token
+        }
+    }
+    let res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/video`, config);
+    if(!res) return null;
+    if(res.status !== "200") console.log(res.data);
+    return res.data;
+}
+
 export const videoService = {
     uploadVideo,
+    getVideos,
 };

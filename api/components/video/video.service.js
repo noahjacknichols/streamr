@@ -106,8 +106,7 @@ localUpload = async(file, videoId) => {
         const POSTFIX = `.${file.name.split('.').pop()}`;
         const PREFIX = `./assets/`
         if (!file) throw new Error(c.ERROR.BAD_BODY);
-        let compressedFile = await snappy.compress(file.data);
-        await fs.writeFile(PREFIX + videoId + POSTFIX, compressedFile);
+        await fs.writeFile(PREFIX + videoId + POSTFIX, file.data);
         return true;
     } catch (e) {
         throw e;

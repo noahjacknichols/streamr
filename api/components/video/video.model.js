@@ -35,6 +35,14 @@ const VideoSchema = new Schema(
             type: String,
             default: "HIDDEN", //HIDDEN, UPLOADED, IN_PROGRESS
         },
+        video_location: {
+            type: String,
+            default: "", //LOCAL, CLOUD, LINK
+        },
+        extension: {
+            type: String,
+            default: null
+        }
     },
     { timestamps: true }
 );

@@ -1,7 +1,7 @@
-import React from "react";
-import { Row, Col, Container } from "react-bootstrap";
-import { withRouter } from "react-router-dom";
-import "../../css/video.css";
+import React from 'react';
+import { Row, Col, Container } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom'
+import '../../css/video.css';
 class VideoPlayerPreview extends React.Component {
     playerRef = React.createRef();
     constructor(props) {
@@ -10,50 +10,42 @@ class VideoPlayerPreview extends React.Component {
 
     toVideo = () => {
         this.props.history.push("/video");
-    };
-
+    }
+    
     vidPlay = () => {
         let vid = this.playerRef.current;
         vid.volume = 0.5;
-        if (vid.paused) {
+        if(vid.paused) {
             vid.play();
         }
-    };
+    }
 
     vidPause = () => {
         let vid = this.playerRef.current;
-        if (!vid.paused) {
+        if(!vid.paused) {
             vid.pause();
         }
-    };
+    }
 
     gotoVid = () => {
-        this.props.history.push("/video/" + this.props.videoId);
-    };
-
+        this.props.history.push('/video/' + this.props.videoId);
+    }
+    
     render() {
-        const url = `http://localhost:5000/video/${this.props.videoId}/stream#t=145`;
-        return (
+        const url=`${process.env.REACT_APP_API_DOMAIN}/video/${this.props.videoId}/stream#t=145`
+        return(
             <div className="preview-box">
                 <div>
-                    <div className="videoTitle">Evangelion</div>
-                    <div className="">
-                        <video
-                            className="video-container-preview"
-                            ref={this.playerRef}
-                            onMouseEnter={this.vidPlay}
-                            onMouseLeave={this.vidPause}
-                            preload="metadata"
-                            onClick={this.gotoVid}
-                        >
-                            <source src={url} type="video/mp4"></source>
-                            <track
-                                src="http://localhost:5000/video/stream"
-                                kind="subtitles"
-                                srcLang="en"
-                            ></track>
-                        </video>
-                    </div>
+                    <div className="videoTitle">
+                            {this.props.video.video_title ? this.props.video.video_title : ""}
+                        </div>
+                        <div className="">
+                            <video className="video-container-preview" ref={this.playerRef}
+                                onMouseEnter={this.vidPlay} onMouseLeave={this.vidPause}  preload="metadata" onClick={this.gotoVid}>
+                                <source src={url} type="video/mp4"></source>
+                                <track src="http://localhost:5000/video/stream" kind="subtitles" srcLang="en"></track>
+                            </video>
+                        </div>
                 </div>
 
                 <div className="video-play-button shadow">
@@ -61,13 +53,11 @@ class VideoPlayerPreview extends React.Component {
                         <i className="video-play-icon fas fa-play "> </i>
                         <div className="video-play-text">Play</div>
                     </div>
-                    <i
-                        onClick={this.toVideo}
-                        className="setting-icon fas fa-cog "
-                    ></i>
+                    <i onClick={this.toVideo}className="setting-icon fas fa-cog "></i>
+                    
                 </div>
             </div>
-        );
+        )
     }
 }
 
