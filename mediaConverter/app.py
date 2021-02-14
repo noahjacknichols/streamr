@@ -25,21 +25,23 @@ def get_files_in_bucket(bucket):
     return [bucket_obj for bucket_obj in bucket.objects.all()]
 
 def resize_video(video_path, width):
+    print('resize')
     if(os.path.isfile(video_path)):
         input_vid = ffmpeg.input(video_path)
         video_name = video_path.split('.')[0]
-        print('vid:', video_name)
+        audio = input_vid.audio
         vid = (
             input_vid
-            .filter('scale', width, -2)
-            .output('./temp/out/' + 'test', f="mp4", segment_time='30')
+            .filter('scale', width, 0)
+            .output(audio, './temp/out/' + 'test', f="mp4")
+            .overwrite_output()
             .run()
             )
         return True
 
 def download_file(bucket, video, settings):
-        bucket.download_file(video.key, './temp/in/' + video.key)
-        resize_video('./temp/in/' + video.key, '720')
+    bucket.download_file(video.key, './temp/in/' + video.key)
+    resize_video('./temp/in/' + video.key, '720')
 
 
 def main():
