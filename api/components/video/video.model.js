@@ -42,6 +42,9 @@ const VideoSchema = new Schema(
         extension: {
             type: String,
             default: null
+        },
+        cloud_data: {
+            type: Object,
         }
     },
     { timestamps: true }

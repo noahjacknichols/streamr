@@ -1,17 +1,14 @@
-import Navbar from '../components/navbar';
-import LoginForm from '../components/forms/loginForm';
+import Navbar from "../components/navbar";
+import LoginForm from "../components/forms/loginForm";
 
-export default function Home(){
-    return(
+export default function Home() {
+    return (
         <div>
-            <Navbar/>
+            <Navbar />
             {/* <VideoPreview/>
             <VideoPreview/> */}
             {/* <UploadForm/> */}
-            <div>
-                Hello ugly
-            </div>
-            <LoginForm/>
+            <LoginForm />
         </div>
-    )
+    );
 }

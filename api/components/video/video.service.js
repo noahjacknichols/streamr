@@ -81,7 +81,7 @@ exports.handleFileUpload = async (file, videoId, uploadType='local') => {
     try {
         if (!file) throw new Error(c.ERROR.BAD_BODY);
         console.log(file);
-        uploadType === 'cloud' ? cloudUpload(file, videoId) : localUpload(file, videoId);
+        return uploadType === 'cloud' ? await cloudUpload(file, videoId) : await localUpload(file, videoId);
     } catch (e) {
         console.log("error uploading");
         throw e;
@@ -114,23 +114,27 @@ localUpload = async(file, videoId) => {
 }
 
 cloudUpload = async(file, videoId) => {
-    console.log('uploading to cloud');
     try{
         const POSTFIX = `.${file.name.split('.').pop()}`;
         let params = { 
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
             Body: file.data, Key: videoId + POSTFIX,
-            Bucket: process.env.BUCKET_NAME
+            Bucket: process.env.BUCKET_NAME,
+
         }
         AWS.config.update({
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
+            useAccelerateEndpoint: true
         })
-        const s3 = await new AWS.S3.ManagedUpload({params});
-        s3.send((err, data) => {
-            console.log(err, data);
-        });
+        const s3 = new AWS.S3.ManagedUpload({params}).promise();
+        return await s3.then(async (data) => {
+            return await Video.findOneAndUpdate({_id: videoId}, {cloud_data: data, state: "UPLOADED"}, {new: true});
+        })
+        .catch((err) => {
+            throw err;
+        })
     } catch (e) {
         throw e;
     }

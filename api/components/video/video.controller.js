@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 let Video = mongoose.model("Video", VideoSchema);
 let videoService = require("./video.service");
+const c = require('../../constants');
 
 exports.createVideo = async (req, res, next) => {
     try {
@@ -10,7 +11,7 @@ exports.createVideo = async (req, res, next) => {
         if (req.files) {
             console.log(req.body);
             console.log('sent files');
-            videoService.handleFileUpload(req.files.file, insertedVid.id, req.body.uploadType);
+            insertedVid = await videoService.handleFileUpload(req.files.file, insertedVid.id, req.body.uploadType);
         }
         return res.status(200).json(insertedVid);
     } catch (e) {
@@ -30,9 +31,11 @@ exports.getVideoById = async (req, res) => {
 };
 
 exports.streamVideo = (req, res) => {
-    // const path = req.body.path;
-    const path = "public/assets/eva2.mkv";
+    
+    // const path = "public/assets/eva2.mkv";
     try {
+        const path = req.body.path;
+        if(!path) throw new Error(c.ERROR.BAD_BODY);
         return videoService.streamVideo(path, req.headers.range, res);
     } catch (e) {
         console.log(e.message);
