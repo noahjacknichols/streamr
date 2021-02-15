@@ -134,7 +134,7 @@ def create_HLS(filename):
         hls = video.hls(Formats.h264())
         hls.auto_generate_representations()
         ffmpeg_s3 = get_ffmpeg_s3()
-        hls.output(clouds=ffmpeg_s3, monitor=monitor)
+        hls.output(clouds=ffmpeg_s3)
     except Exception as e:
         print(e)
     return
@@ -178,9 +178,8 @@ def conversionHandler():
 
 
 def main():
-    schedule.every(1).minutes.do(conversionHandler)
+    print('converter starting up.')
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        conversionHandler()
 
 main()

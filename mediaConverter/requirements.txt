@@ -6,7 +6,7 @@ future==0.18.2
 jmespath==0.10.0
 python-dateutil==2.8.1
 python-dotenv==0.15.0
-python-ffmpeg-video-streaming==0.1.14
+python-ffmpeg-video-streaming>=0.1
 s3transfer==0.3.4
 schedule==1.0.0
 six==1.15.0
