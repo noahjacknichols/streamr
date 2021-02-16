@@ -15,6 +15,7 @@ BUCKET_IN = os.getenv("BUCKET_NAME")
 BUCKET_OUT = os.getenv("BUCKET_OUT_NAME")
 ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+CLOUDFRONT_URL = os.getenv("S3_URL")
 locked = False
 
 
@@ -105,8 +106,8 @@ def resize_video(video_path, height):
             return False
 
 def download_file(bucket, video):
-    bucket.download_file(video.key, './temp/in/' + video.key)
-    return './temp/in/' + video.key
+    bucket.download_file(video, './temp/in/' + video)
+    return './temp/in/' + video
 
 def delete_local_file(filename):
     if os.path.exists(filename):
@@ -129,7 +130,6 @@ def get_ffmpeg_s3():
 
 def create_HLS(filename):
     try:
-
         video = ffmpeg_streaming.input(filename)
         hls = video.hls(Formats.h264())
         hls.auto_generate_representations()
@@ -144,7 +144,7 @@ def get_next_video():
         bucket = list_my_buckets()
         if(bucket[BUCKET_IN]):
             next_video = get_files_in_bucket(bucket[BUCKET_IN])[0]
-            location = download_file(bucket[BUCKET_IN], next_video)
+            location = download_file(bucket[BUCKET_IN], next_video.key)
             return {"location": location, "key": next_video.key}
     except Exception as e:
         print(e)
@@ -160,6 +160,21 @@ def delete_s3_file( filename):
         print(e)
     return False
 
+def update_hls_manifest(filename):
+    bucket = list_my_buckets()
+    if(bucket[BUCKET_OUT]):
+        filename = filename.split('.')[0] + '.m3u8'
+        file_loc = download_file(bucket[BUCKET_OUT], filename)
+        lines = open(file_loc, 'r').readlines()
+        for line in range(len(lines)):
+            if('#' not in lines[line]):
+                new_line = CLOUDFRONT_URL + lines[line]
+                lines[line] = new_line
+        out = open(file_loc, 'w')
+        out.writelines(lines)
+        upload_file_to_s3(BUCKET_OUT, filename)
+
+
 def conversionHandler():
     global locked
     if not locked:
@@ -169,8 +184,9 @@ def conversionHandler():
             res = get_next_video()
             if(res):
                 print('next video:', res['key'])
-                create_HLS(res['location'])
+                # create_HLS(res['location'])
                 delete_local_file(res['location'])
+                update_hls_manifest(res['key'])
                 # delete_s3_file(res['key'])
         except Exception as e:
             print(e)
@@ -179,7 +195,7 @@ def conversionHandler():
 
 def main():
     print('converter starting up.')
-    while True:
-        conversionHandler()
+    # while True:
+    conversionHandler()
 
 main()
