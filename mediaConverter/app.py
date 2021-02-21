@@ -9,6 +9,7 @@ import datetime
 from ffmpeg_streaming import Formats, S3, CloudManager
 import schedule
 import time
+from pymongo import MongoClient
 
 load_dotenv()
 BUCKET_IN = os.getenv("BUCKET_NAME")
@@ -17,6 +18,8 @@ ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 CLOUDFRONT_URL = os.getenv("S3_URL")
 locked = False
+client = MongoClient(os.getenv("DB_STRING"))
+db = client.streamr
 
 
 
@@ -85,41 +88,26 @@ def monitor(ffmpeg, duration, time_, time_left, process):
     )
     sys.stdout.flush()
 
-def resize_video(video_path, height):
-    if(os.path.isfile(video_path)):
-        try:
-
-            input_vid = ffmpeg.input(video_path)
-            print(video_path)
-            video_name = video_path.split('/').pop().split('.')[0]
-            audio = input_vid.audio
-            vid = (
-                input_vid
-                .filter('scale', -2, height)
-                .output(audio, './temp/out/' + video_name, f="hls", start_number=0, hls_time=5)
-                .overwrite_output()
-                .run()
-                )
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
 def download_file(bucket, video):
-    bucket.download_file(video, './temp/in/' + video)
-    return './temp/in/' + video
+    try:
+        print('bucket:', bucket, 'video:', video)
+        x = bucket.download_file(video, './temp/in/' + video)
+        print(x)
+        print('finished download')
+        return './temp/in/' + video
+    except:
+        return None
 
 def delete_local_file(filename):
     if os.path.exists(filename):
         os.remove(filename)
 
-def upload_file_to_s3(filename, bucket, upload_name=None):
-    if os.path.exists(filename):
-        if upload_name is None:
-            upload_name = filename
+def upload_file_to_s3(filepath, filename, bucket):
+    print(bucket)
+    s3Client = boto3.client('s3', region_name='us-east-1', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+    if os.path.exists(filepath):
         try:
-            res = s3.upload_file(filename, bucket, upload_name)
-            return res
+            bucket.upload_file(Filename=filepath, Key=filename)
         except Exception as e:
             print(e)
         
@@ -139,16 +127,17 @@ def create_HLS(filename):
         print(e)
     return
 
-def get_next_video():
-    try:
-        bucket = list_my_buckets()
-        if(bucket[BUCKET_IN]):
-            next_video = get_files_in_bucket(bucket[BUCKET_IN])[0]
-            location = download_file(bucket[BUCKET_IN], next_video.key)
-            return {"location": location, "key": next_video.key}
-    except Exception as e:
-        print(e)
-    return None
+# def get_next_video():
+#     try:
+#         bucket = list_my_buckets()
+#         if(bucket[BUCKET_IN]):
+#             next_video = get_files_in_bucket(bucket[BUCKET_IN])[0]
+#             print(next_video)
+#             location = download_file(bucket[BUCKET_IN], next_video.key)
+#             return {"location": location, "key": next_video.key}
+#     except Exception as e:
+#         print(e)
+#     return None
 
 def delete_s3_file( filename):
     try:
@@ -170,10 +159,13 @@ def update_hls_manifest(filename):
             if('#' not in lines[line]):
                 new_line = CLOUDFRONT_URL + lines[line]
                 lines[line] = new_line
-        out = open(file_loc, 'w')
+        print(lines)
+        # out = open(file_loc, 'w')
+        out = open('./temp/in/test.m3u8', 'w')
         out.writelines(lines)
-        upload_file_to_s3(BUCKET_OUT, filename)
-
+        bucket = list_my_buckets()
+        upload_file_to_s3('./temp/in/' + filename, filename, bucket[BUCKET_OUT])
+        # upload_file_to_s3('./temp/in/test.m3u8', 'test.m3u8', bucket[BUCKET_OUT])
 
 def conversionHandler():
     global locked
@@ -182,16 +174,38 @@ def conversionHandler():
         try:
             print('running converter')
             res = get_next_video()
-            if(res):
-                print('next video:', res['key'])
-                # create_HLS(res['location'])
-                delete_local_file(res['location'])
+            print('res done')
+            if(res['location'] is not None):
+                print('god vid')
+                print('next video:', res['key'], res['location'])
+                create_HLS(res['location'])
                 update_hls_manifest(res['key'])
-                # delete_s3_file(res['key'])
+                update_video_status(res['key'], 'COMPLETED')
+            else:
+                # update_video_status(res['key'], 'FAILED')
+                print('fail')
         except Exception as e:
             print(e)
         locked = False
 
+def get_next_video():
+    
+    try:
+        vid = db.videos.find_one({'state': 'UPLOADED'})
+        print('vid is:', vid)
+        if(vid):
+            bucket = list_my_buckets()
+            if(bucket[BUCKET_IN]):
+                location = download_file(bucket[BUCKET_IN], str(vid['cloud_data']['Key']))
+                print('location:', location)
+                return {"location": location, "key": str(vid['_id'])}
+    except Exception as e:
+        print(e)
+    return None
+
+def update_video_status(id, status):
+    completed = db.videos.find_one_and_update({'_id':id}, {'$set': {'state': status}})
+    return completed
 
 def main():
     print('converter starting up.')

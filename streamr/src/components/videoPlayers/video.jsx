@@ -1,25 +1,31 @@
-import React from "react";
-import { Row, Col, Container } from "react-bootstrap";
-import "../../css/video.css";
+import React from 'react';
+import videojs from 'video.js'
+
 export default class Video extends React.Component {
-    render() {
-        const url = `http://localhost:5000/video/${this.props.videoId}/stream`;
-        return (
-            <Container>
-                <Row>
-                    <Col xs={12}>
-                        <div className="video-background">
-                            <video
-                                className="video-container"
-                                controls
-                                autoPlay
-                            >
-                                <source src={url} type="video/mp4"></source>
-                            </video>
-                        </div>
-                    </Col>
-                </Row>
-            </Container>
-        );
+  componentDidMount() {
+    // instantiate Video.js
+    this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
+      console.log('onPlayerReady', this)
+    });
+  }
+
+  // destroy player on unmount
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.dispose()
     }
+  }
+
+  // wrap the player in a div with a `data-vjs-player` attribute
+  // so videojs won't create additional wrapper in the DOM
+  // see https://github.com/videojs/video.js/pull/3856
+  render() {
+    return (
+      <div>	
+        <div data-vjs-player>
+          <video ref={ node => this.videoNode = node } className="video-js video-container"></video>
+        </div>
+      </div>
+    )
+  }
 }
