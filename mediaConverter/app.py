@@ -1,15 +1,14 @@
 # How to save $$$ on AWS mediaConvert :^)
-import ffmpeg
 from dotenv import load_dotenv
 import os
-import sys
 import boto3
 import ffmpeg_streaming
-import datetime
 from ffmpeg_streaming import Formats, S3, CloudManager
 import schedule
 import time
 from pymongo import MongoClient
+import time
+from os import walk
 
 load_dotenv()
 BUCKET_IN = os.getenv("BUCKET_NAME")
@@ -42,71 +41,39 @@ def create_bucket(bucket_name, region):
 def get_files_in_bucket(bucket):
     return [bucket_obj for bucket_obj in bucket.objects.all()]
 
-def monitor(ffmpeg, duration, time_, time_left, process):
-    """
-    Handling proccess.
-
-    Examples:
-    1. Logging or printing ffmpeg command
-    logging.info(ffmpeg) or print(ffmpeg)
-
-    2. Handling Process object
-    if "something happened":
-        process.terminate()
-
-    3. Email someone to inform about the time of finishing process
-    if time_left > 3600 and not already_send:  # if it takes more than one hour and you have not emailed them already
-        ready_time = time_left + time.time()
-        Email.send(
-            email='someone@somedomain.com',
-            subject='Your video will be ready by %s' % datetime.timedelta(seconds=ready_time),
-            message='Your video takes more than %s hour(s) ...' % round(time_left / 3600)
-        )
-       already_send = True
-
-    4. Create a socket connection and show a progress bar(or other parameters) to your users
-    Socket.broadcast(
-        address=127.0.0.1
-        port=5050
-        data={
-            percentage = per,
-            time_left = datetime.timedelta(seconds=int(time_left))
-        }
-    )
-
-    :param ffmpeg: ffmpeg command line
-    :param duration: duration of the video
-    :param time_: current time of transcoded video
-    :param time_left: seconds left to finish the video process
-    :param process: subprocess object
-    :return: None
-    """
-    per = round(time_ / duration * 100)
-    sys.stdout.write(
-        "\rTranscoding...(%s%%) %s left [%s%s]" %
-        (per, datetime.timedelta(seconds=int(time_left)), '#' * per, '-' * (100 - per))
-    )
-    sys.stdout.flush()
-
+def upload_files_in_directory(mypath):
+    bucket = list_my_buckets()
+    f = []
+    for (dirpath, dirnames, filenames) in walk(mypath):
+        f.extend(filenames)
+        break
+    print(f)
+    for file in f:
+        upload_file_to_s3('/temp/out/' + file, file, bucket[BUCKET_OUT])
+        delete_local_file('/temp/out/' + file)
 def download_file(bucket, video):
     try:
         print('bucket:', bucket, 'video:', video)
+        print('./temp/in/' + video)
         x = bucket.download_file(video, './temp/in/' + video)
-        print(x)
         print('finished download')
         return './temp/in/' + video
-    except:
+    except Exception as e:
+        print('download error:', e)
         return None
 
 def delete_local_file(filename):
+    print('local file:', filename)
     if os.path.exists(filename):
         os.remove(filename)
 
 def upload_file_to_s3(filepath, filename, bucket):
-    print(bucket)
+    print(bucket, filepath, filename)
     s3Client = boto3.client('s3', region_name='us-east-1', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     if os.path.exists(filepath):
         try:
+            filepath = os.path.abspath(os.getcwd()) + filepath
+            print('updated filepath:', filepath)
             bucket.upload_file(Filename=filepath, Key=filename)
         except Exception as e:
             print(e)
@@ -116,28 +83,19 @@ def get_ffmpeg_s3():
     save_to_s3 = CloudManager().add(ffmpeg_s3, bucket_name=BUCKET_OUT)
     return save_to_s3
 
-def create_HLS(filename):
+def create_HLS(filepath, filename):
     try:
-        video = ffmpeg_streaming.input(filename)
+        print('hls filename:', filepath)
+        print('hls filename2:', filename)
+        video = ffmpeg_streaming.input(filepath)
+        print('video hls:', video)
         hls = video.hls(Formats.h264())
         hls.auto_generate_representations()
         ffmpeg_s3 = get_ffmpeg_s3()
-        hls.output(clouds=ffmpeg_s3)
+        hls.output('./temp/out/' + filename + '.m3u8')
     except Exception as e:
         print(e)
     return
-
-# def get_next_video():
-#     try:
-#         bucket = list_my_buckets()
-#         if(bucket[BUCKET_IN]):
-#             next_video = get_files_in_bucket(bucket[BUCKET_IN])[0]
-#             print(next_video)
-#             location = download_file(bucket[BUCKET_IN], next_video.key)
-#             return {"location": location, "key": next_video.key}
-#     except Exception as e:
-#         print(e)
-#     return None
 
 def delete_s3_file( filename):
     try:
@@ -150,66 +108,82 @@ def delete_s3_file( filename):
     return False
 
 def update_hls_manifest(filename):
-    bucket = list_my_buckets()
-    if(bucket[BUCKET_OUT]):
-        filename = filename.split('.')[0] + '.m3u8'
-        file_loc = download_file(bucket[BUCKET_OUT], filename)
-        lines = open(file_loc, 'r').readlines()
-        for line in range(len(lines)):
-            if('#' not in lines[line]):
-                new_line = CLOUDFRONT_URL + lines[line]
-                lines[line] = new_line
-        print(lines)
-        # out = open(file_loc, 'w')
-        out = open('./temp/in/test.m3u8', 'w')
-        out.writelines(lines)
-        bucket = list_my_buckets()
-        upload_file_to_s3('./temp/in/' + filename, filename, bucket[BUCKET_OUT])
-        # upload_file_to_s3('./temp/in/test.m3u8', 'test.m3u8', bucket[BUCKET_OUT])
+    print('updating manifest')
+    print('file:', filename)
+    try:
 
+        bucket = list_my_buckets()
+        if(bucket[BUCKET_OUT]):
+            filename = filename.split('.')[0] + '.m3u8'
+            print('filename:', filename)
+            # file_loc = download_file(bucket[BUCKET_OUT], filename)
+            # if file_loc is None: return None
+            # print('file_loc:', file_loc)
+            file_loc = './temp/out/' + filename 
+            lines = open(file_loc, 'r').readlines()
+            for line in range(len(lines)):
+                if('#' not in lines[line]):
+                    new_line = CLOUDFRONT_URL + lines[line]
+                    lines[line] = new_line
+            print(lines)
+            out = open(file_loc, 'w')
+            # out = open('./temp/in/test.m3u8', 'w')
+            out.writelines(lines)
+            # bucket = list_my_buckets()
+            # upload_file_to_s3('/temp/in/' + filename, filename, bucket[BUCKET_OUT])
+            return True
+    except Exception as e:
+        return None
 def conversionHandler():
-    global locked
-    if not locked:
-        locked = True
-        try:
-            print('running converter')
-            res = get_next_video()
-            print('res done')
-            if(res['location'] is not None):
-                print('god vid')
-                print('next video:', res['key'], res['location'])
-                create_HLS(res['location'])
-                update_hls_manifest(res['key'])
-                update_video_status(res['key'], 'COMPLETED')
+    try:
+        res = get_next_video()
+        if(res is not None and res['location'] is not None):
+            print('next video:', res['key'], res['location'])
+            create_HLS(res['location'], str(res['key']))
+            # time.sleep(60)
+            if update_hls_manifest(str(res['key'])) is None: update_video_status(res['key'], 'FAILED')
+            upload_files_in_directory('./temp/out')
+            update_video_status(res['key'], 'COMPLETED')
+            
+            return True
+        else:
+            if(res is not None):
+                print('download failed for video:', res['key'])
+                update_video_status(res['key'], 'FAILED')
             else:
-                # update_video_status(res['key'], 'FAILED')
-                print('fail')
-        except Exception as e:
-            print(e)
-        locked = False
+                print('no videos found..')
+                return False 
+    except Exception as e:
+        print('conversion error occurred:', e)
+    return False
 
 def get_next_video():
-    
     try:
-        vid = db.videos.find_one({'state': 'UPLOADED'})
+        vid = db.videos.find_one({'state': 'UPLOADED', 'cloud_data': {'$exists': True}})
         print('vid is:', vid)
-        if(vid):
+        if(vid) is not None:
             bucket = list_my_buckets()
             if(bucket[BUCKET_IN]):
                 location = download_file(bucket[BUCKET_IN], str(vid['cloud_data']['Key']))
-                print('location:', location)
-                return {"location": location, "key": str(vid['_id'])}
+                return {"location": location, "key": vid['_id']}
     except Exception as e:
-        print(e)
+        print('error getting next video:', e)
     return None
 
 def update_video_status(id, status):
+    print('updating video:', id, 'status:', status)
     completed = db.videos.find_one_and_update({'_id':id}, {'$set': {'state': status}})
+    print('completed video:', completed)
     return completed
 
 def main():
     print('converter starting up.')
-    # while True:
-    conversionHandler()
-
+    
+    while True:
+        start_time = time.time()
+        status = conversionHandler()
+        print('conversion took:' , time.time() - start_time,'.moving to next video')
+        if not status:
+            print('converter failed. sleeping..')
+            time.sleep(10)
 main()

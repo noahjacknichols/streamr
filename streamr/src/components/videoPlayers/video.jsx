@@ -3,9 +3,22 @@ import videojs from 'video.js'
 
 export default class Video extends React.Component {
   componentDidMount() {
+    const handleClick = (vid) => {
+        if(vid.paused()){
+            vid.play()
+        }else{
+            vid.pause()
+        }
+    }
     // instantiate Video.js
     this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
       console.log('onPlayerReady', this)
+      this.on('click', function(evt){
+          evt.preventDefault();
+            console.log("click", evt.clientX, evt.clientY)
+            //handle click on screen
+            handleClick(this);
+      })
     });
   }
 
@@ -16,14 +29,12 @@ export default class Video extends React.Component {
     }
   }
 
-  // wrap the player in a div with a `data-vjs-player` attribute
-  // so videojs won't create additional wrapper in the DOM
-  // see https://github.com/videojs/video.js/pull/3856
+
   render() {
     return (
       <div>	
         <div data-vjs-player>
-          <video ref={ node => this.videoNode = node } className="video-js video-container"></video>
+          <video ref={ node => this.videoNode = node }  className="video-js video-container"></video>
         </div>
       </div>
     )
