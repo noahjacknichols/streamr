@@ -2,8 +2,9 @@ var express = require("express");
 const validateToken = require("../../middleware/auth.middleware");
 const videoController = require("./video.controller");
 const video = express.Router();
-
-video.post("/", validateToken, videoController.createVideo);
+const schemaValidator = require('../../middleware/body.validation')
+const validateRequest = schemaValidator("videoSchema")
+video.post("/", validateRequest, validateToken, videoController.createVideo);
 
 video.get("/", validateToken, videoController.getVideos);
 

@@ -6,6 +6,7 @@ let videoService = require("./video.service");
 const c = require('../../constants');
 
 exports.createVideo = async (req, res, next) => {
+    console.log('creating video')
     try {
         let insertedVid = await videoService.createVideo(req.body, req.user);
         if (req.files) {
