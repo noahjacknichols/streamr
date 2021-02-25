@@ -62,18 +62,20 @@ def download_file(bucket, video):
         print('download error:', e)
         return None
 
+
+
 def delete_local_file(filename):
     print('local file:', filename)
     if os.path.exists(filename):
         os.remove(filename)
 
 def upload_file_to_s3(filepath, filename, bucket):
-    print(bucket, filepath, filename)
+    # print(bucket, filepath, filename)
     s3Client = boto3.client('s3', region_name='us-east-1', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+    filepath = os.path.abspath(os.getcwd()) + filepath
     if os.path.exists(filepath):
         try:
-            filepath = os.path.abspath(os.getcwd()) + filepath
-            print('updated filepath:', filepath)
+            # print('updated filepath:', filepath)
             bucket.upload_file(Filename=filepath, Key=filename)
         except Exception as e:
             print(e)
@@ -144,7 +146,7 @@ def conversionHandler():
             if update_hls_manifest(str(res['key'])) is None: update_video_status(res['key'], 'FAILED')
             upload_files_in_directory('./temp/out')
             update_video_status(res['key'], 'COMPLETED')
-            
+            delete_local_file('./temp/in' + str(res['key']))
             return True
         else:
             if(res is not None):
@@ -187,3 +189,9 @@ def main():
             print('converter failed. sleeping..')
             time.sleep(10)
 main()
+def test():
+    bucket = list_my_buckets()
+    file = 'test.txt'
+
+    upload_file_to_s3('/temp/out/' + file, file, bucket[BUCKET_OUT])
+
