@@ -11,7 +11,7 @@ function App() {
   return (
     <Switch>
       <Route path="/" exact component={Home}/>
-      <Route path="/video" component={VideoPage}/>
+      <Route path="/video/:id" component={VideoPage}/>
       <Route path="/login" component={Login}/>
       <Route path="/upload" component={Upload}/>
     </Switch>

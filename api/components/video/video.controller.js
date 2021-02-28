@@ -60,7 +60,9 @@ exports.updateVideo = async (req, res) => {
 
 exports.getVideos = async (req, res) => {
     try {
-        let videos = await videoService.getAllVideos();
+        const {find, sort, skip, limit } = req.body
+        console.log({find, sort, skip, limit})
+        let videos = await videoService.getAllVideos(find);
         return res.status(200).json(videos);
     } catch (e) {
         console.error(e);

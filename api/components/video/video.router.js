@@ -6,7 +6,7 @@ const schemaValidator = require('../../middleware/body.validation')
 const validateRequest = schemaValidator("videoSchema")
 video.post("/", validateRequest, validateToken, videoController.createVideo);
 
-video.get("/", validateToken, videoController.getVideos);
+video.post("/search",  validateToken, videoController.getVideos);
 
 video.get("/:videoId", videoController.getVideoById);
 

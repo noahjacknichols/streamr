@@ -88,12 +88,12 @@ exports.handleFileUpload = async (file, videoId, uploadType='local') => {
     }
 };
 
-exports.getAllVideos = async (skipBy = 0) => {
+exports.getAllVideos = async (find= {}, sort = {createdAt: -1}, limit = 15, skip = 0) => {
     try {
-        const allVideos = await Video.find()
-            .sort({ createdAt: -1 })
-            .limit(15)
-            .skip(skipBy);
+        const allVideos = await Video.find(find)
+            .sort(sort)
+            .limit(limit)
+            .skip(skip);
         return allVideos;
     } catch (e) {
         console.error(e);

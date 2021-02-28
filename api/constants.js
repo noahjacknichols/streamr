@@ -9,3 +9,9 @@ exports.ERROR = {
 exports.CONSTANTS = {
     JWT_KEY: "Q7F4P4R89VXZOKVIVIQN"
 }
+
+exports.MODELS = {
+    video: {
+        state: ["LOCAL", "UPLOADED", "IN_PROGRESS", "COMPLETED"]
+    }
+}

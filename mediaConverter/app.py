@@ -63,11 +63,11 @@ def download_file(bucket, video):
         return None
 
 
-
 def delete_local_file(filename):
     print('local file:', filename)
-    if os.path.exists(filename):
-        os.remove(filename)
+    filepath = os.path.abspath(os.getcwd()) + filename
+    if os.path.exists(filepath):
+        os.remove(filepath)
 
 def upload_file_to_s3(filepath, filename, bucket):
     # print(bucket, filepath, filename)
@@ -113,7 +113,6 @@ def update_hls_manifest(filename):
     print('updating manifest')
     print('file:', filename)
     try:
-
         bucket = list_my_buckets()
         if(bucket[BUCKET_OUT]):
             filename = filename.split('.')[0] + '.m3u8'

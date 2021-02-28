@@ -22,15 +22,21 @@ const uploadVideo = async (token, data) => {
     return res.data;
 };
 
-const getVideos = async(token) => {
-    console.log('allvids');
+const getVideos = async(token, find = {}, sort= {}, skip = 0, limit = 15) => {
     console.log(token);
-    let config = {
+    console.log(find, sort, skip, limit)
+    let options = {
         headers: {
             token: token
         }
     }
-    let res = await axios.get(`${process.env.REACT_APP_API_DOMAIN}/video`, config);
+    let body = {
+            find: find
+    }
+    let res = await axios.post(
+        `${process.env.REACT_APP_API_DOMAIN}/video/search`,
+        body, options
+    );
     if(!res) return null;
     if(res.status !== "200") console.log(res.data);
     return res.data;
