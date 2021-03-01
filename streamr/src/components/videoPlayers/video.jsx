@@ -65,7 +65,7 @@ export default class Video extends React.Component {
       <div>	
         <div data-vjs-player>
           <video ref={ node => this.videoNode = node }  className="video-js video-container">
-            <track src="https://streamr-destination-bucket.s3.amazonaws.com/603868ecf0355d326c8967db_1080_vtt.m3u8" kind="text" srclang="en" label="English"></track>
+            {/* <track src="https://streamr-destination-bucket.s3.amazonaws.com/603868ecf0355d326c8967db_1080_vtt.m3u8" kind="text" srclang="en" label="English"></track> */}
           </video>
         </div>
       </div>
