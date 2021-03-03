@@ -42,7 +42,10 @@ class PreviewContainer extends React.Component {
         let find = {
             state: { $in: ["UPLOADED", "COMPLETED"] },
         };
-        let vids = await videoService.getVideos(ck, find);
+        let sort = {
+            createdAt: -1
+        }
+        let vids = await videoService.getVideos(ck, find, sort);
         this.setState({ videos: vids }, () => {
             this.setState({ loading: false });
         });

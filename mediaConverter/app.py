@@ -9,6 +9,7 @@ import time
 from pymongo import MongoClient
 import time
 from os import walk
+import asyncio
 
 load_dotenv()
 BUCKET_IN = os.getenv("BUCKET_NAME")
@@ -30,7 +31,7 @@ s3 = get_s3('us-east-1')
 
 def list_my_buckets():
     return {b.name: b for b in s3.buckets.all()}
-
+all_buckets = list_my_buckets()
 def create_bucket(bucket_name, region):
     try:
         bucket = s3.create_bucket(Bucket=bucket_name)
@@ -48,9 +49,26 @@ def upload_files_in_directory(mypath):
         f.extend(filenames)
         break
     print(f)
+
+
     for file in f:
         upload_file_to_s3('/temp/out/' + file, file, bucket[BUCKET_OUT])
         delete_local_file('/temp/out/' + file)
+
+async def upload_handler(files):
+    index = 0
+    queue = 0
+    while index < len(files):
+        if(queue < 10):
+            queue += 1
+            index += 1
+            queue -= upload(files[index])
+
+async def upload(file):
+    await upload_file_to_s3('/temp/out/' + file, file, all_buckets[BUCKET_OUT])
+    return 1
+
+
 def download_file(bucket, video):
     try:
         print('bucket:', bucket, 'video:', video)

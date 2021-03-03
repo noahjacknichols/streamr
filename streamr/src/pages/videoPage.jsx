@@ -23,7 +23,7 @@ class Home extends React.Component {
                 preload: "auto",
                 sources: [
                     {
-                        src: `https://streamr-destination-bucket.s3.amazonaws.com/${this.props?.location?.pathname?.split("/").pop()}.m3u8`,
+                        src: `${process.env.REACT_APP_CLOUDFRONT}${this.props?.location?.pathname?.split("/").pop()}.m3u8`,
                         type: "application/x-mpegURL",
                     },
                 ],
