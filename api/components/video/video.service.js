@@ -1,7 +1,7 @@
 const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
 const fs = require("fs");
-let Video = mongoose.model("Video", VideoSchema);
+let Video = require('./video.model')
 const c = require("../../constants");
 let util = require("../../util");
 const AWS = require("aws-sdk");

@@ -1,7 +1,7 @@
 const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
 const fs = require("fs");
-let Video = mongoose.model("Video", VideoSchema);
+let Video = require('./video.model')
 let videoService = require("./video.service");
 const c = require('../../constants');
 
