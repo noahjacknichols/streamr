@@ -1,4 +1,5 @@
 require("dotenv").config();
+let environment = process.env.ENVIRONMENT ? process.env.ENVIRONMENT : 'TESTING';
 const express = require("express"),
     app = express(),
     http = require("http"),
@@ -11,10 +12,13 @@ const express = require("express"),
 port = process.env.API_PORT;
 mongoose.set("useCreateIndex", true);
 mongoose.set("useFindAndModify", false);
-mongoose.connect(process.env.DB_STRING, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+if(environment !== 'TESTING'){
+    mongoose.connect(process.env.DB_STRING, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+}
+
 app.use(morgan("dev"));
 app.use(fileUpload({
     useTempFiles:true,

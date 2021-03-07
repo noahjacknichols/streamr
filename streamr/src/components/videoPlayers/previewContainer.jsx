@@ -40,7 +40,7 @@ class PreviewContainer extends React.Component {
     getVids = async () => {
         let ck = cookie.load("token");
         let find = {
-            state: { $in: ["UPLOADED", "COMPLETED"] },
+            state: { $in: ["COMPLETED"] },
         };
         let sort = {
             createdAt: -1
@@ -60,7 +60,7 @@ class PreviewContainer extends React.Component {
                 return (
                     <Preview
                         video={vid}
-                        {...this.getVidSettings(this.state.videos[0]._id)}
+                        {...this.getVidSettings(vid._id)}
                     />
                 );
             })
