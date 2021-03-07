@@ -33,7 +33,7 @@ const VideoSchema = new Schema(
         },
         state: {
             type: String,
-            default: "UPLOADED", //LOCAL, UPLOADED, IN_PROGRESS, COMPLETED
+            default: "CREATED", //LOCAL, UPLOADED, IN_PROGRESS, COMPLETED
         },
         video_location: {
             type: String,

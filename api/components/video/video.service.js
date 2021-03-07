@@ -1,11 +1,19 @@
 const VideoSchema = require("./video.model");
 const mongoose = require("mongoose");
-const fs = require("fs").promises;
+const fs = require("fs");
 let Video = mongoose.model("Video", VideoSchema);
 const c = require("../../constants");
 let util = require("../../util");
 const AWS = require("aws-sdk");
+const stream = require('stream');
 
+
+/**
+ * 
+ * @param {Object} body the request body 
+ * @param {Object} user the validated user object
+ * @returns 
+ */
 exports.createVideo = async (body, user) => {
     body._uploadedById = user.id;
     try {
@@ -17,6 +25,11 @@ exports.createVideo = async (body, user) => {
     }
 };
 
+/**
+ * 
+ * @param {MongoId} videoId 
+ * @returns {Object} video entry with associated _id
+ */
 exports.getVideo = async (videoId) => {
     try {
         let foundVideo = await Video.findById({ _id: videoId });
@@ -65,6 +78,12 @@ exports.streamVideo = (path, range, res) => {
     }
 };
 
+/**
+ * 
+ * @param {MongoId} videoId 
+ * @param {Object} body the request body 
+ * @returns {Object}
+ */
 exports.updateVideo = async (videoId, body) => {
     try {
         let updated = await Video.findOneAndUpdate({ _id: videoId }, body, {
@@ -77,6 +96,13 @@ exports.updateVideo = async (videoId, body) => {
     }
 };
 
+/**
+ * 
+ * @param {Object} file express-file-upload object 
+ * @param {MongoId} videoId 
+ * @param {String} uploadType which upload handler to run 
+ * @returns {Object}
+ */
 exports.handleFileUpload = async (file, videoId, uploadType='local') => {
     try {
         if (!file) throw new Error(c.ERROR.BAD_BODY);
@@ -88,6 +114,14 @@ exports.handleFileUpload = async (file, videoId, uploadType='local') => {
     }
 };
 
+/**
+ * 
+ * @param {Object} find the query to search by 
+ * @param {Object} sort how to sort the result
+ * @param {Object} limit the number of entries to return
+ * @param {Object} skip the number of entries to skip
+ * @returns {Object} 
+ */
 exports.getAllVideos = async (find= {}, sort = {createdAt: -1}, limit = 15, skip = 0) => {
     try {
         const allVideos = await Video.find(find)
@@ -101,6 +135,11 @@ exports.getAllVideos = async (find= {}, sort = {createdAt: -1}, limit = 15, skip
     }
 };
 
+/**
+ * @param {Object} file express-file-upload object
+ * @param {MongoId} videoId
+ * @return {Boolean} returns true if writing file finishes successfully
+ */
 localUpload = async(file, videoId) => {
     try {
         const POSTFIX = `.${file.name.split('.').pop()}`;
@@ -113,28 +152,56 @@ localUpload = async(file, videoId) => {
     }
 }
 
+const uploadStream = ({ Bucket, Key }) => {
+    const s3 = new AWS.S3({
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_KEY
+    });
+    const pass = new stream.PassThrough();
+    return {
+      writeStream: pass,
+      promise: s3.upload({ Bucket, Key, Body: pass }).promise(),
+    };
+  }
+
+/**
+ * @param {Object} file express-file-upload obj
+ * @param {MongoId} videoId
+ * @returns {Object} the updated mongo object 
+ */
 cloudUpload = async(file, videoId) => {
+    console.log('file:', file, 'videoId:', videoId)
     try{
         const POSTFIX = `.${file.name.split('.').pop()}`;
+        const fileData = fs.createReadStream(file.tempFilePath)
+        const { writeStream, promise } = uploadStream({Bucket: process.env.BUCKET_NAME, Key: videoId + POSTFIX});
+        const readStream = fs.createReadStream(file.tempFilePath);
+        const pipeline = readStream.pipe(writeStream);
+        return await promise.then(async(data) => {
+            return await Video.findOneAndUpdate({_id: videoId}, {cloud_data: data, state: "UPLOADED"}, {new: true});
+          }).catch((err) => {
+            console.log('upload failed.', err.message);
+          });
+
         let params = { 
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
-            Body: file.data, Key: videoId + POSTFIX,
+            Body: fileData, Key: videoId + POSTFIX,
             Bucket: process.env.BUCKET_NAME,
 
         }
-        AWS.config.update({
-            accessKeyId: process.env.AWS_ACCESS_KEY,
-            secretAccessKey: process.env.AWS_SECRET_KEY,
-            useAccelerateEndpoint: true
-        })
-        const s3 = new AWS.S3.ManagedUpload({params}).promise();
-        return await s3.then(async (data) => {
-            return await Video.findOneAndUpdate({_id: videoId}, {cloud_data: data, state: "UPLOADED"}, {new: true});
-        })
-        .catch((err) => {
-            throw err;
-        })
+        // AWS.config.update({
+        //     accessKeyId: process.env.AWS_ACCESS_KEY,
+        //     secretAccessKey: process.env.AWS_SECRET_KEY,
+        //     useAccelerateEndpoint: true
+        // })
+        // const s3 = new AWS.S3.ManagedUpload({params}).promise();
+        // return await s3.then(async (data) => {
+        //     return await Video.findOneAndUpdate({_id: videoId}, {cloud_data: data, state: "UPLOADED"}, {new: true});
+        // })
+        // .catch((err) => {
+        //     throw err;
+        // })
     } catch (e) {
         throw e;
     }

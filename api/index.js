@@ -16,7 +16,10 @@ mongoose.connect(process.env.DB_STRING, {
     useUnifiedTopology: true,
 });
 app.use(morgan("dev"));
-app.use(fileUpload());
+app.use(fileUpload({
+    useTempFiles:true,
+    tempFiledir: '/tmp/'
+}));
 app.use(cors());
 app.use(express.json());
 app.use(routes);

@@ -21,6 +21,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "tailwindcss": "^2.0.3",
     "video-react": "^0.14.1",
     "video.js": "^7.11.4",
     "videojs": "^1.0.0",

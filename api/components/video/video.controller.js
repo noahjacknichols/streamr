@@ -10,14 +10,15 @@ exports.createVideo = async (req, res, next) => {
     try {
         let insertedVid = await videoService.createVideo(req.body, req.user);
         if (req.files) {
-            console.log(req.body);
-            console.log('sent files');
             insertedVid = await videoService.handleFileUpload(req.files.file, insertedVid.id, req.body.uploadType);
+            fs.unlink(req.files.file.tempFilePath, (err) => {
+                if(err) throw err;
+            })
         }
         return res.status(200).json(insertedVid);
     } catch (e) {
         console.log(e.message);
-        res.status(400).json({ error: e.message });
+        res.status(400).json({ error: e.message, stackTrace: e.stackTrace});
     }
 };
 
@@ -31,9 +32,8 @@ exports.getVideoById = async (req, res) => {
     }
 };
 
+//Deprecated indefinitely
 exports.streamVideo = (req, res) => {
-    
-    // const path = "public/assets/eva2.mkv";
     try {
         const path = req.body.path;
         if(!path) throw new Error(c.ERROR.BAD_BODY);

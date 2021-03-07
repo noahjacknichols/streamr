@@ -4,12 +4,12 @@ import os
 import boto3
 import ffmpeg_streaming
 from ffmpeg_streaming import Formats, S3, CloudManager
-import schedule
 import time
 from pymongo import MongoClient
 import time
 from os import walk
-import asyncio
+from multiprocessing.pool import ThreadPool
+from ffmpeg_streaming import Formats, Bitrate, Representation, Size
 
 load_dotenv()
 BUCKET_IN = os.getenv("BUCKET_NAME")
@@ -48,24 +48,26 @@ def upload_files_in_directory(mypath):
     for (dirpath, dirnames, filenames) in walk(mypath):
         f.extend(filenames)
         break
-    print(f)
 
-
+    # upload_handler(f)
     for file in f:
         upload_file_to_s3('/temp/out/' + file, file, bucket[BUCKET_OUT])
         delete_local_file('/temp/out/' + file)
 
-async def upload_handler(files):
-    index = 0
-    queue = 0
-    while index < len(files):
-        if(queue < 10):
-            queue += 1
-            index += 1
-            queue -= upload(files[index])
+def upload_handler(files):
+    pool = ThreadPool(processes=10)
+    pool.map(upload, files)
+    # index = 0
+    # queue = 0
+    # while index < len(files):
+    #     if(queue < 10):
+    #         queue += 1
+    #         index += 1
+    #         queue -= upload(files[index])
 
-async def upload(file):
-    await upload_file_to_s3('/temp/out/' + file, file, all_buckets[BUCKET_OUT])
+def upload(file):
+    upload_file_to_s3('/temp/out/' + file, file, all_buckets[BUCKET_OUT])
+    delete_local_file('/temp/out/' + file)
     return 1
 
 
@@ -88,7 +90,7 @@ def delete_local_file(filename):
         os.remove(filepath)
 
 def upload_file_to_s3(filepath, filename, bucket):
-    # print(bucket, filepath, filename)
+    print(bucket, filepath, filename)
     s3Client = boto3.client('s3', region_name='us-east-1', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     filepath = os.path.abspath(os.getcwd()) + filepath
     if os.path.exists(filepath):
@@ -110,7 +112,7 @@ def create_HLS(filepath, filename):
         video = ffmpeg_streaming.input(filepath)
         print('video hls:', video)
         hls = video.hls(Formats.h264())
-        hls.auto_generate_representations()
+        # hls.auto_generate_representations()
         ffmpeg_s3 = get_ffmpeg_s3()
         hls.output('./temp/out/' + filename + '.m3u8')
     except Exception as e:
@@ -160,7 +162,7 @@ def conversionHandler():
             print('next video:', res['key'], res['location'])
             create_HLS(res['location'], str(res['key']))
             # time.sleep(60)
-            if update_hls_manifest(str(res['key'])) is None: update_video_status(res['key'], 'FAILED')
+            if update_hls_manifest(str(res['key'])) is None: return update_video_status(res['key'], 'FAILED')
             upload_files_in_directory('./temp/out')
             update_video_status(res['key'], 'COMPLETED')
             delete_local_file('./temp/in' + str(res['key']))
