@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const Joi = require('joi');
 let Schemas = require('./validationSchemas');
 
 module.exports = (schemaToUse) => {
@@ -9,14 +8,13 @@ module.exports = (schemaToUse) => {
     allowUnknown: true, // allow unknown keys that will be ignored
     stripUnknown: true  // remove unknown keys from the validated data
   };
-  Schemas = Schemas[schemaToUse]
+  let Schema = Schemas[schemaToUse]
   // return the validation middleware
   return (req, res, next) => {
     const route = req.route.path;
-    console.log('method:', req.method)
-    if (_.has(Schemas, route)) {
+    if (_.has(Schema, route)) {
       // get schema for the current route
-      const _schema = _.get(Schemas, route)[req.method];
+      const _schema = _.get(Schema, route)[req.method];
       if (_schema) {
         // Validate req.body using the schema and validation options
         const { error, value } = _schema.validate(req.body, _validationOptions);

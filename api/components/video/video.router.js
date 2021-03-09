@@ -4,6 +4,7 @@ const videoController = require("./video.controller");
 const video = express.Router();
 const schemaValidator = require('../../middleware/body.validation')
 const validateRequest = schemaValidator("videoSchema")
+
 video.post("/", validateRequest, validateToken, videoController.createVideo);
 
 video.post("/search",  validateToken, videoController.getVideos);

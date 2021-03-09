@@ -1,6 +1,6 @@
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi)
-const c = require('../../constants')
+const c = require('../../config/constants')()
 
 const videoPost = Joi.object({
     video_title: Joi.string().required(),
@@ -8,7 +8,7 @@ const videoPost = Joi.object({
     file: Joi.any().optional(),
     genres: Joi.array().optional(),
     subtitles: Joi.string().optional(),
-    state: Joi.string().valid(...c.MODELS.video.state).optional(), // remember to get enum here
+    state: Joi.string().valid(...c.models.video.state).optional(), // remember to get enum here
     video_location: Joi.string().optional(),
     uploadType: Joi.string().optional()
 })
@@ -20,9 +20,11 @@ const searchPost = Joi.object({
     limit: Joi.object().optional(),
 
 })
+
 const video = {
     'POST': videoPost
 }
+
 const search = {
     'POST': searchPost
 }

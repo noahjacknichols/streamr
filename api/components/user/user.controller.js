@@ -15,13 +15,12 @@ exports.getUserInfo = async (req, res, next) => {
             res.status(200).json(payload);
         });
     } catch (err) {
-        res.status(400).json(err.message);
+        next(e)
     }
 };
 
 exports.editUserInfo = async (req, res, next) => {
-    const field = req.body.field;
-    const value = req.body.value;
+    const { field, value } = req.body
     try {
         const update = { $set: { [field]: value } };
         User.findOneAndUpdate(
@@ -36,7 +35,6 @@ exports.editUserInfo = async (req, res, next) => {
             }
         );
     } catch (err) {
-        console.error(err);
-        res.status(400).json({ err });
+        next(e)
     }
 };
