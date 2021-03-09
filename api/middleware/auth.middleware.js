@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
-const c = require('../constants')
+const c = require('../config/constants')();
 
 module.exports = function (req, res, next) {
-  console.log('body:', req.body)
   const token = req.header("token");
   if (!token) return res.status(401).json({ error: c.ERROR.PERMISSION_DENIED });
 
