@@ -1,6 +1,7 @@
 const fs = require("fs");
 let videoService = require("./video.service");
 const c = require('../../config/constants')();
+const Video = require('./video.model')
 
 exports.createVideo = async (req, res, next) => {
     console.log('creating video')

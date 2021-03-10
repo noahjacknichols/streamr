@@ -1,6 +1,6 @@
 const UserSchema = require("./user.model");
 const mongoose = require("mongoose");
-let User = mongoose.model("User", UserSchema);
+let User = require('./user.model')
 
 exports.getUserInfo = async (req, res, next) => {
     try {

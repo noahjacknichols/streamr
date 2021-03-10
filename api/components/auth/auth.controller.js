@@ -61,7 +61,7 @@ exports.create = async (req, res, next) => {
                 return res.status(201).json({ token });
             }
         );
-    } catch (err) {
+    } catch (e) {
         next(e)
     }
 };

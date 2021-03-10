@@ -6,7 +6,7 @@ module.exports = function (req, res, next) {
   if (!token) return res.status(401).json({ error: c.ERROR.PERMISSION_DENIED });
 
   try {
-    const decoded = jwt.verify(token, c.CONSTANTS.JWT_KEY);
+    const decoded = jwt.verify(token, c.app.JWT_KEY);
     req.user = decoded.user;
     next();
   } catch (e) {
